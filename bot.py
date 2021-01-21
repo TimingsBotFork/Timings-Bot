@@ -5,6 +5,7 @@ import sys
 from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
+import time
 
 # import subprocess
 
@@ -23,18 +24,13 @@ logging.basicConfig(filename='console.log',
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 
+# Startup Information
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game(name="a game"))
-    await bot.change_presence(activity=discord.Streaming(name="My Stream", url=my_twitch_url))
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="a song"))
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="a movie"))
-    logging.info("Bot is ready!")
+    await client.change_presence(activity=discord.Game('Sea of Thieves'))
+    logging.info('Connected to bot: {}'.format(client.user.name))
+    logging.info('Bot ID: {}'.format(client.user.id))
     
-@bot.event
-async def on_ready():
-    logging.info('I am running.')
-
 
 @bot.event
 async def on_message(message):
