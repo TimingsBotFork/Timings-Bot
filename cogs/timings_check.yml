@@ -78,11 +78,6 @@ plugins:
       value: |-
         FAWE can corrupt your world. 
         Consider replacing FAWE with [Worldedit](https://enginehub.org/worldedit/#downloads).
-    CMI:
-      prefix: "❌"
-      value: |-
-        CMI is a buggy plugin. 
-        Consider replacing CMI with [EssentialsX](https://essentialsx.net/downloads.html).
     IllegalStack:
       prefix: "❌"
       value: |-
