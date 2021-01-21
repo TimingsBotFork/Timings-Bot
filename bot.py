@@ -36,19 +36,8 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-if running_on_panel:
-    for file_name in os.listdir('./cogs'):
-        if file_name.endswith('_panel.py'):
-            bot.load_extension(f'cogs.{file_name[:-3]}')
-else:
-    for file_name in os.listdir('./cogs'):
-        if file_name.endswith('_public.py'):
-            bot.load_extension(f'cogs.{file_name[:-3]}')
-
-if running_on_panel:
-    print("running on panel, starting loops")
-    updater.start()
-    linking_updater = bot.get_cog('Linking_updater')
-    linking_updater.linking_updater.start()
+for file_name in os.listdir('./cogs'):
+    if file_name.endswith('.py'):
+        bot.load_extension(f'cogs.{file_name[:-3]}')
            
 bot.run(token)
