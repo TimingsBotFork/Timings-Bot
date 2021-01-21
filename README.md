@@ -11,13 +11,7 @@ Paste a timings report to review an in-depth description of potential optimizati
 ## Hastebin upload
 Botflop converts text files into bin links. You can try it out yourself on our [Discord](https://discord.gg/zsz3PzT)
 
-![message.txt](https://i.imgur.com/JAuL3zy.png)
-![latest.log](https://i.imgur.com/AoZGQRi.png)
-![config.yml](https://i.imgur.com/qovRot8.png)
 
-## Pterodactyl linking
-* Links Pterodactyl panel and Discord accounts
-* Ensures backups even when running with Blesta
 
 ## In Progress
 * `.update` command to update either all available plugins to the latest version or just one plugin
