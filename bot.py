@@ -8,6 +8,13 @@ from dotenv import load_dotenv
 
 # import subprocess
 
+@bot.event
+async def on_ready():
+    activity = discord.Game(name="Fork of the original bot from https://github.com/Pemigrade/botflop .", type=3)
+    await bot.change_presence(status=discord.Status.idle, activity=activity)
+    print("Bot is ready!")
+
+
 bot = commands.Bot(command_prefix=".", intents=discord.Intents.all(), chunk_guilds_at_startup=True,
                    case_insensitive=True)
 load_dotenv()
