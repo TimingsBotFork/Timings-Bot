@@ -12,8 +12,6 @@ bot = commands.Bot(command_prefix=".", intents=discord.Intents.all(), chunk_guil
                    case_insensitive=True)
 load_dotenv()
 
-token = os.getenv('token')
-
 logging.basicConfig(filename='console.log',
                     level=logging.INFO,
                     format='[%(asctime)s %(levelname)s] %(message)s',
@@ -36,6 +34,11 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
+@updater.before_loop
+async def before_updater():
+    await bot.wait_until_ready()
+
+
 if running_on_panel:
     for file_name in os.listdir('./cogs'):
         if file_name.endswith('_panel.py'):
@@ -43,5 +46,12 @@ if running_on_panel:
 else:
     for file_name in os.listdir('./cogs'):
         if file_name.endswith('_public.py'):
-            bot.load_extension(f'cogs.{file_name[:-3]}'
+            bot.load_extension(f'cogs.{file_name[:-3]}')
+
+if running_on_panel:
+    print("running on panel, starting loops")
+    updater.start()
+    linking_updater = bot.get_cog('Linking_updater')
+    linking_updater.linking_updater.start()
+           
 bot.run(token)
