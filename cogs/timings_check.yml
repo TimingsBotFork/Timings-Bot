@@ -12,12 +12,6 @@ servers:
   value: |-
     Yatopia is prone to bugs.
     Consider using [Purpur](https://ci.pl3x.net/job/Purpur/).
-- name: "Paper"
-  prefix: "||❌"
-  suffix: "||"
-  value: |-
-    ||Purpur has more optimizations but is generally less supported. 
-    Consider using [Purpur](https://ci.pl3x.net/job/Purpur/).||
 plugins:
   paper:
     ClearLag:
