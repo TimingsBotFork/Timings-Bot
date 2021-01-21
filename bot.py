@@ -34,12 +34,13 @@ async def on_ready():
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
     
 
+keyword = "lagg"
 @bot.event
 async def on_message(message):
-if "lagg" in message.content:
-    logging.info('Detected keyword')
-    await message.channel.send("If you are lagging, please consider seding a Timings report.")
-    await message.channel.send("You can create a timings using the `/timings report` command.")
+      message_text = message.content.strip().lower()
+      if keyword in message_text:
+          await message.channel.send("If you are lagging, please consider seding a Timings report.")
+          await message.channel.send("You can create a timings using the `/timings report` command.")
 
 @bot.event
 async def on_message(message):
