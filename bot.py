@@ -25,11 +25,12 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 @bot.event
 async def on_ready():
-    activity = discord.Game(name="Fork of the original bot from https://github.com/Pemigrade/botflop .", type=3)
-    await bot.change_presence(status=discord.Status.idle, activity=activity)
-    print("Bot is ready!")
-
-
+    await bot.change_presence(activity=discord.Game(name="a game"))
+    await bot.change_presence(activity=discord.Streaming(name="My Stream", url=my_twitch_url))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="a song"))
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="a movie"))
+    logging.info("Bot is ready!")
+    
 @bot.event
 async def on_ready():
     logging.info('I am running.')
