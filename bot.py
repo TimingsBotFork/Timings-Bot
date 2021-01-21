@@ -36,8 +36,8 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-
 if "lagg" in message.content:
+    logging.info('Detected keyword')
     await message.channel.send("If you are lagging, please consider seding a Timings report.")
     await message.channel.send("You can create a timings using the `/timings report` command.")
 
