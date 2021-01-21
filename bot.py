@@ -27,7 +27,7 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 # Startup Information
 @bot.event
 async def on_ready():
-    await client.change_presence(activity=discord.Game('Sea of Thieves'))
+    await bot.change_presence(activity=discord.Game('Sea of Thieves'))
     logging.info('Connected to bot: {}'.format(client.user.name))
     logging.info('Bot ID: {}'.format(client.user.id))
     
