@@ -12,6 +12,8 @@ bot = commands.Bot(command_prefix=".", intents=discord.Intents.all(), chunk_guil
                    case_insensitive=True)
 load_dotenv()
 
+token = os.getenv('token')
+
 logging.basicConfig(filename='console.log',
                     level=logging.INFO,
                     format='[%(asctime)s %(levelname)s] %(message)s',
