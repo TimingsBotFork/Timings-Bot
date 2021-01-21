@@ -36,11 +36,6 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-@updater.before_loop
-async def before_updater():
-    await bot.wait_until_ready()
-
-
 if running_on_panel:
     for file_name in os.listdir('./cogs'):
         if file_name.endswith('_panel.py'):
