@@ -30,8 +30,8 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game('Sea of Thieves'))
     logging.info('Connected to bot: {}'.format(bot.user.name))
     logging.info('Bot ID: {}'.format(bot.user.id))
-    loggin.info('Bot fully loaded'))
-    loggin.info('Original creators: https://github.com/Pemigrade/botflop'))
+    loggin.info('Bot fully loaded')
+    loggin.info('Original creators: https://github.com/Pemigrade/botflop')
     
 
 @bot.event
