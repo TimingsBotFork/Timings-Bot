@@ -28,8 +28,10 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 @bot.event
 async def on_ready():
     await bot.change_presence(activity=discord.Game('Sea of Thieves'))
-    logging.info('Connected to bot: {}'.format(client.user.name))
-    logging.info('Bot ID: {}'.format(client.user.id))
+    logging.info('Connected to bot: {}'.format(bot.user.name))
+    logging.info('Bot ID: {}'.format(bot.user.id))
+    loggin.info('Bot fully loaded'))
+    loggin.info('Original creators: https://github.com/Pemigrade/botflop'))
     
 
 @bot.event
