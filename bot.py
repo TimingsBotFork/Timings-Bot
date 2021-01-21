@@ -41,7 +41,7 @@ async def on_message(message):
       message_text = message.content.strip().upper()
       if keyword in message_text:
             # do something here, change to whatever you want
-            await bot.send_message(message.channel, "'{}' if your server is lagging, Please paste a timings report.".format(keyword))
+            await bot.send_message(message.channel, 'If your server is lagging, please paste a timings report.')
 
 @bot.event
 async def on_message(message):
