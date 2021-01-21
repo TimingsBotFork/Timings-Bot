@@ -34,6 +34,15 @@ async def on_ready():
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
     
 
+keyword = "lagg"
+
+@bot.event
+async def on_message(message):
+      message_text = message.content.strip().upper()
+      if keyword in message_text:
+            # do something here, change to whatever you want
+            await bot.send_message(message.channel, "'{}' if your server is lagging, Please paste a timings report.".format(keyword))
+
 @bot.event
 async def on_message(message):
 
