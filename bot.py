@@ -27,11 +27,11 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 # Startup Information
 @bot.event
 async def on_ready():
-    await bot.change_presence(activity=discord.Game('Sea of Thieves'))
+    await bot.change_presence(activity=discord.Game('Fork of the original timings bot'))
     logging.info('Connected to bot: {}'.format(bot.user.name))
     logging.info('Bot ID: {}'.format(bot.user.id))
-    loggin.info('Bot fully loaded')
-    loggin.info('Original creators: https://github.com/Pemigrade/botflop')
+    logging.info('Bot fully loaded')
+    logging.info('Original creators: https://github.com/Pemigrade/botflop')
     
 
 @bot.event
