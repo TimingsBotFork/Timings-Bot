@@ -90,7 +90,7 @@ class Timings(commands.Cog):
                 if timing_cost > 300:
                     embed_var.add_field(name="❌ Timingcost",
                                         value="Your timingcost is " + str(
-                                            timing_cost) + ". Find a [better host](https://www.birdflop.com).")
+                                            timing_cost) + ". Find a etter host.")
             except KeyError as key:
                 print("Missing: " + str(key))
 
