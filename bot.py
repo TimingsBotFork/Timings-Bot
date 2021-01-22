@@ -41,6 +41,47 @@ async def on_message(message):
       if keyword in message_text:
           await message.channel.send("If you are lagging, please consider seding a Timings report.")
           await message.channel.send("You can create a timings using the `/timings report` command.")
+          
+          
+          client.command(aliases = ["google","search"],
+
+description = "Will search the internet from a given search term and return the top web result")
+
+u/client.command(aliases = ["google","search"],
+
+description = "Will search the internet from a given search term and return the top web result")
+
+async def Search(ctx,*,query):
+
+searchInput = "https://google.com/search?q="+urllib.parse.quote(query)
+
+res = requests.get(searchInput)
+
+res.raise_for_status()
+
+soup = bs4.BeautifulSoup(res.text, "html.parser")
+
+linkElements = soup.select('div#main > div > div > div > a')
+
+if len(linkElements) == 0:
+
+await ctx.send("Couldn't find any results...")
+
+else:
+
+link = linkElements[0].get("href")
+
+i = 0
+
+while link[0:4] != "/url" or link[14:20] == "google":
+
+i += 1
+
+link = linkElements[i].get("href")
+
+await ctx.send(":desktop: http://google.com"+link)
+          
+          
 
 @bot.event
 async def on_message(message):
