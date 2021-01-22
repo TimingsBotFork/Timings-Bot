@@ -5,7 +5,7 @@ import sys
 from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
-import timen
+import time
 from discord.ext import commands
 from googlesearch import search 
 import urllib.parse
