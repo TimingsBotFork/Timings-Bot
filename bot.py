@@ -6,9 +6,10 @@ from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
 import time
-import urllib.parse
 import requests
 from googlesearch import search 
+from db import post_search_data, fetch_search_data
+from search import search_main
 
 # import subprocess
 
@@ -35,19 +36,35 @@ async def on_ready():
     logging.info('Bot ID: {}'.format(bot.user.id))
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
-         
-
+    
+    
 @bot.event
 async def on_message(message):
-    if message.content.startswith('just google'):
-        searchContent = ""
-        text = str(message.content).split(' ')
-        for i in range(2, len(text)):
-            searchContent = searchContent + text[i]
+    # we do not want the bot to reply to itself
+    if message.author == client.user:
+        return
 
-        for j in search(searchContent, tld="co.in", num=1, stop=1, pause=2):
-            await message.channel.send(j)
+    if message.content.startswith('hi'):
+        msg = 'Hey {0.author.mention}'.format(message)
+        await message.channel.send(msg)
 
+    if message.content.startswith('!google'):
+        query = message.content.split(None, 1)[1]
+        author_id = message.author.id
+        post_search_data(author_id, query)
+
+        #Test API Data
+        #results = ['https://en.wikipedia.org/wiki/Greta_Gerwig', 'https://www.imdb.com/name/nm1950086/', 'https://www.nytimes.com/2019/10/31/movies/greta-gerwig-little-women.html', 'https://www.theguardian.com/film/2018/jan/11/greta-gerwig-regrets-woody-allen-film-i-will-not-work-for-him-again', 'https://www.nytimes.com/2018/01/09/opinion/greta-gerwig-woody-allen-aaron-sorkin.html']
+        
+        results = search_main(query)
+        if results:
+            links = ' \n'.join(results)
+            print(links)
+            msg = 'Hello {}, you searched for {}. The top five results are: \n {}'.format(message.author.mention, query, links)
+        else:
+            msg = 'Hello {}, you searched for {}. \n Sorry, no matching links found.'.format(message.author.mention, query)
+        await message.channel.send(msg)   
+           
 
 
 @bot.event
