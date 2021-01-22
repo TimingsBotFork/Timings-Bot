@@ -37,29 +37,17 @@ async def on_ready():
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
          
 
-@bot.command(helpinfo='Searches the web (or images if typed first)', aliases=['g'])
-async def google(ctx, *, searchquery: str):
-    searchquerylower = searchquery.lower()
-    if searchquerylower.startswith('images '):
-        await ctx.send('<https://www.google.com/search?tbm=isch&q={}>'
-                       .format(urllib.parse.quote_plus(searchquery[7:])))
-    else:
-        await ctx.send('<https://www.google.com/search?q={}>'
-                       .format(urllib.parse.quote_plus(searchquery)))
+@bot.event
+async def on_message(message):
+    if message.content.startswith('just google'):
+        searchContent = ""
+        text = str(message.content).split(' ')
+        for i in range(2, len(text)):
+            searchContent = searchContent + text[i]
 
+        for j in search(searchContent, tld="co.in", num=1, stop=1, pause=2):
+            await message.channel.send(j)
 
-@bot.command(helpinfo='Searches for YouTube videos', aliases=['yt'])
-async def youtube(ctx, *, query: str):
-    '''
-    Uses YouTube Data v3 API to search for videos
-    '''
-    req = requests.get(
-        ('https://www.googleapis.com/youtube/v3/search?part=id&maxResults=1'
-         '&order=relevance&q={}&relevanceLanguage=en&safeSearch=moderate&type=video'
-         '&videoDimension=2d&fields=items%2Fid%2FvideoId&key=')
-        .format(query) + os.getenv('YOUTUBE_API_KEY'))
-    await ctx.send('**Video URL: https://www.youtube.com/watch?v={}**'
-                   .format(req.json()['items'][0]['id']['videoId']))
 
 
 @bot.event
