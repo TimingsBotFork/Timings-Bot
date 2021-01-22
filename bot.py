@@ -57,7 +57,7 @@ async def youtube(ctx, *, query: str):
         ('https://www.googleapis.com/youtube/v3/search?part=id&maxResults=1'
          '&order=relevance&q={}&relevanceLanguage=en&safeSearch=moderate&type=video'
          '&videoDimension=2d&fields=items%2Fid%2FvideoId&key=')
-        .format(query) + os.environ['YOUTUBE_API_KEY'])
+        .format(query) + os.getenv('YOUTUBE_API_KEY'))
     await ctx.send('**Video URL: https://www.youtube.com/watch?v={}**'
                    .format(req.json()['items'][0]['id']['videoId']))
 
