@@ -47,6 +47,21 @@ async def google(ctx, *, searchquery: str):
         await ctx.send('<https://www.google.com/search?q={}>'
                        .format(urllib.parse.quote_plus(searchquery)))
 
+
+@bot.command(helpinfo='Searches for YouTube videos', aliases=['yt'])
+async def youtube(ctx, *, query: str):
+    '''
+    Uses YouTube Data v3 API to search for videos
+    '''
+    req = requests.get(
+        ('https://www.googleapis.com/youtube/v3/search?part=id&maxResults=1'
+         '&order=relevance&q={}&relevanceLanguage=en&safeSearch=moderate&type=video'
+         '&videoDimension=2d&fields=items%2Fid%2FvideoId&key=')
+        .format(query) + os.environ['YOUTUBE_API_KEY'])
+    await ctx.send('**Video URL: https://www.youtube.com/watch?v={}**'
+                   .format(req.json()['items'][0]['id']['videoId']))
+
+
 @bot.event
 async def on_message(message):
 
