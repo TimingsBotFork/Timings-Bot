@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 import timen
 from discord.ext import commands
 from googlesearch import search 
+import urllib.parse
+import requests
 
 
 # import subprocess
@@ -36,7 +38,7 @@ async def on_ready():
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
     
- @bot.command(helpinfo='Searches the web (or images if typed first)', aliases=['g'])
+@bot.command(helpinfo='Searches the web (or images if typed first)', aliases=['g'])
 async def google(ctx, *, searchquery: str):
     searchquerylower = searchquery.lower()
     if searchquerylower.startswith('images '):
@@ -45,8 +47,7 @@ async def google(ctx, *, searchquery: str):
     else:
         await ctx.send('<https://www.google.com/search?q={}>'
                        .format(urllib.parse.quote_plus(searchquery)))  
-    
-    
+   
 
 @bot.event
 async def on_message(message):
