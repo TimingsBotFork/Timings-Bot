@@ -38,14 +38,14 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.content.startswith('just google'):
+    if message.content.startswith('.g'):
         searchContent = ""
         text = str(message.content).split(' ')
         for i in range(2, len(text)):
             searchContent = searchContent + text[i]
 
         for j in search(searchContent, tld="co.in", num=1, stop=1, pause=2):
-            await message.channel.send(j)   
+            await message.channel.send(j)
 
 @bot.event
 async def on_message(message):
