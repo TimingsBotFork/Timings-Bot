@@ -38,7 +38,7 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.content.startswith('.g'):
+    if message.content.startswith('g'):
         searchContent = ""
         text = str(message.content).split(' ')
         for i in range(2, len(text)):
