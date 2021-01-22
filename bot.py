@@ -6,6 +6,7 @@ from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
 import time
+from googlesearch import search 
 
 # import subprocess
 
@@ -32,56 +33,19 @@ async def on_ready():
     logging.info('Bot ID: {}'.format(bot.user.id))
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
-    
+         
 
-keyword = "lagg"
+
 @bot.event
 async def on_message(message):
-      message_text = message.content.strip().lower()
-      if keyword in message_text:
-          await message.channel.send("If you are lagging, please consider seding a Timings report.")
-          await message.channel.send("You can create a timings using the `/timings report` command.")
-          
-          
-          client.command(aliases = ["google","search"],
+    if message.content.startswith('just google'):
+        searchContent = ""
+        text = str(message.content).split(' ')
+        for i in range(2, len(text)):
+            searchContent = searchContent + text[i]
 
-description = "Will search the internet from a given search term and return the top web result")
-
-u/client.command(aliases = ["google","search"],
-
-description = "Will search the internet from a given search term and return the top web result")
-
-async def Search(ctx,*,query):
-
-searchInput = "https://google.com/search?q="+urllib.parse.quote(query)
-
-res = requests.get(searchInput)
-
-res.raise_for_status()
-
-soup = bs4.BeautifulSoup(res.text, "html.parser")
-
-linkElements = soup.select('div#main > div > div > div > a')
-
-if len(linkElements) == 0:
-
-await ctx.send("Couldn't find any results...")
-
-else:
-
-link = linkElements[0].get("href")
-
-i = 0
-
-while link[0:4] != "/url" or link[14:20] == "google":
-
-i += 1
-
-link = linkElements[i].get("href")
-
-await ctx.send(":desktop: http://google.com"+link)
-          
-          
+        for j in search(searchContent, tld="co.in", num=1, stop=1, pause=2):
+            await message.channel.send(j)   
 
 @bot.event
 async def on_message(message):
