@@ -1,16 +1,15 @@
 import os
 import discord
+import requests
+import json
 import logging
 import sys
-import json
 from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
-import time
-from discord.ext import commands
-from googlesearch import search 
-import urllib.parse
-import requests
+import aiohttp
+import asyncio
+import paramiko
 
 
 # import subprocess
