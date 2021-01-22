@@ -51,6 +51,8 @@ async def google(ctx, *, searchquery: str):
 
 @bot.event
 async def on_message(message):
+    if not running_on_panel:
+        # Binflop
         if len(message.attachments) > 0:
             if not message.attachments[0].url.endswith(
                     ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image')):
@@ -77,11 +79,6 @@ async def on_message(message):
                             embed_var.description = response
                             await message.channel.send(embed=embed_var)
                           
-@bot.command()
-async def ping(ctx):
-        if guild_id == ctx.guild.id:
-            await ctx.send(f'Public bot ping is {round(bot.latency * 1000)}ms')
-                       
 
 @bot.event
 async def on_message(message):
