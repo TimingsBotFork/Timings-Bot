@@ -2,6 +2,7 @@ import os
 import discord
 import logging
 import sys
+import json
 from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
@@ -46,8 +47,46 @@ async def google(ctx, *, searchquery: str):
                        .format(urllib.parse.quote_plus(searchquery[7:])))
     else:
         await ctx.send('<https://www.google.com/search?q={}>'
-                       .format(urllib.parse.quote_plus(searchquery)))  
-   
+                       .format(urllib.parse.quote_plus(searchquery))) 
+
+@bot.event
+async def on_message(message):
+    if not running_on_panel:
+        # Binflop
+        if len(message.attachments) > 0:
+            if not message.attachments[0].url.endswith(
+                    ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image')):
+                download = message.attachments[0].url
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(download, allow_redirects=True) as r:
+
+                        # r = requests.get(download, allow_redirects=True)
+                        text = await r.text()
+                        text = "\n".join(text.splitlines())
+                        if '�' not in text:  # If it's not an image/gif
+                            truncated = False
+                            if len(text) > 100000:
+                                text = text[:99999]
+                                truncated = True
+                            req = requests.post('https://bin.birdflop.com/documents', data=text)
+                            key = json.loads(req.content)['key']
+                            response = ""
+                            response = response + "https://bin.birdflop.com/" + key
+                            response = response + "\nRequested by " + message.author.mention
+                            if truncated:
+                                response = response + "\n(file was truncated because it was too long.)"
+                            embed_var = discord.Embed(title="Please use a paste service", color=0x1D83D4)
+                            embed_var.description = response
+                            await message.channel.send(embed=embed_var)
+                          
+@bot.command()
+async def ping(ctx):
+    if running_on_panel:
+        if guild_id == ctx.guild.id:
+            await ctx.send(f'Private bot ping is {round(bot.latency * 1000)}ms')
+    if not running_on_panel:
+        await ctx.send(f'Public bot ping is {round(bot.latency * 1000)}ms')
+                       
 
 @bot.event
 async def on_message(message):
