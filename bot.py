@@ -6,6 +6,8 @@ from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
 import time
+import urllib.parse
+import requests
 from googlesearch import search 
 
 # import subprocess
@@ -35,17 +37,15 @@ async def on_ready():
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
          
 
-
-@bot.event
-async def on_message(message):
-    if message.content.startswith('. google'):
-        searchContent = ""
-        text = str(message.content).split(' ')
-        for i in range(2, len(text)):
-            searchContent = searchContent + text[i]
-
-        for j in search(searchContent, tld="co.in", num=1, stop=1, pause=2):
-            await message.channel.send(j)
+@bot.command(helpinfo='Searches the web (or images if typed first)', aliases=['g'])
+async def google(ctx, *, searchquery: str):
+    searchquerylower = searchquery.lower()
+    if searchquerylower.startswith('images '):
+        await ctx.send('<https://www.google.com/search?tbm=isch&q={}>'
+                       .format(urllib.parse.quote_plus(searchquery[7:])))
+    else:
+        await ctx.send('<https://www.google.com/search?q={}>'
+                       .format(urllib.parse.quote_plus(searchquery)))
 
 @bot.event
 async def on_message(message):
