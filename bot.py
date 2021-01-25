@@ -37,16 +37,7 @@ async def on_ready():
     logging.info('Bot ID: {}'.format(bot.user.id))
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
-    
-@bot.command(helpinfo='Searches the web (or images if typed first)', aliases=['g'])
-async def google(ctx, *, searchquery: str):
-    searchquerylower = searchquery.lower()
-    if searchquerylower.startswith('images '):
-        await ctx.send('<https://www.google.com/search?tbm=isch&q={}>'
-                       .format(urllib.parse.quote_plus(searchquery[7:])))
-    else:
-        await ctx.send('<https://www.google.com/search?q={}>'
-                       .format(urllib.parse.quote_plus(searchquery))) 
+     
 
 @bot.event
 async def on_message(message):
