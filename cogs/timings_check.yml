@@ -12,6 +12,12 @@ servers:
   value: |-
     Yatopia is prone to bugs.
     Consider using [Purpur](https://ci.pl3x.net/job/Purpur/).
+- name: "Paper"
+  prefix: "||❌"
+  suffix: "||"
+  value: |-
+    ||Purpur has more optimizations but is generally less supported. 
+    Consider using [Purpur](https://ci.pl3x.net/job/Purpur/).||
 plugins:
   paper:
     ClearLag:
@@ -78,6 +84,11 @@ plugins:
       value: |-
         FAWE can corrupt your world. 
         Consider replacing FAWE with [Worldedit](https://enginehub.org/worldedit/#downloads).
+    CMI:
+      prefix: "❌"
+      value: |-
+        CMI is a buggy plugin. 
+        Consider replacing CMI with [EssentialsX](https://essentialsx.net/downloads.html).
     IllegalStack:
       prefix: "❌"
       value: |-
@@ -418,22 +429,22 @@ config:
     - expressions:
       - int(paper["world-settings"]["default"]["entity-per-chunk-save-limit"]["experience_orb"]) == -1
       prefix: "❌"
-      value: "Set a value in [paper.yml](http://bit.ly/paperconf). Recommended: 16."
+      value: "Set a value in [paper.yml](https://github.com/PaperMC/Paper/pull/4792). Recommended: 16."
     entity-per-chunk-save-limit.snowball:
     - expressions:
       - int(paper["world-settings"]["default"]["entity-per-chunk-save-limit"]["snowball"]) == -1
       prefix: "❌"
-      value: "Set a value in [paper.yml](http://bit.ly/paperconf). Recommended: 16."
+      value: "Set a value in [paper.yml](https://github.com/PaperMC/Paper/pull/4792). Recommended: 16."
     entity-per-chunk-save-limit.ender_pearl:
     - expressions:
       - int(paper["world-settings"]["default"]["entity-per-chunk-save-limit"]["ender_pearl"]) == -1
       prefix: "❌"
-      value: "Set a value in [paper.yml](http://bit.ly/paperconf). Recommended: 16."
+      value: "Set a value in [paper.yml](https://github.com/PaperMC/Paper/pull/4792). Recommended: 16."
     entity-per-chunk-save-limit.arrow:
     - expressions:
       - int(paper["world-settings"]["default"]["entity-per-chunk-save-limit"]["arrow"]) == -1
       prefix: "❌"
-      value: "Set a value in [paper.yml](http://bit.ly/paperconf). Recommended: 16."
+      value: "Set a value in [paper.yml](https://github.com/PaperMC/Paper/pull/4792). Recommended: 16."
   purpur:
     settings.use-alternate-keepalive:
     - expressions:
