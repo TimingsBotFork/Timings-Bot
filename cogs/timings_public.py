@@ -27,12 +27,12 @@ class Timings(commands.Cog):
         words = message.content.replace("\n", " ").split(" ")
         timings_url = ""
         embed_var = discord.Embed(title=self.TIMINGS_TITLE)
-        embed_var.set_footer(text="Requested by " + message.author.name + "#" + message.author.discriminator, icon_url=message.author.avatar_url)
+        embed_var.set_footer(text=f"Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
 
         for word in words:
-            if word.startswith("https://timings.") and "/d=" in word:
+            if word.startswith("https://timin") and "/d=" in word:
                 word.replace("/d=", "/?id=")
-            if word.startswith("https://timings.") and "/?id=" in word:
+            if word.startswith("https://timin") and "/?id=" in word:
                 timings_url = word
                 embed_var.url = timings_url
                 break
@@ -50,6 +50,7 @@ class Timings(commands.Cog):
             timings_url = timings_url.split("#")[0]
         if "?id=" not in timings_url:
             return
+        print(timings_url)
 
         timings_host, timings_id = timings_url.split("?id=")
         timings_json = timings_host + "data.php?id=" + timings_id
@@ -89,8 +90,7 @@ class Timings(commands.Cog):
                 timing_cost = int(request["timingsMaster"]["system"]["timingcost"])
                 if timing_cost > 300:
                     embed_var.add_field(name="❌ Timingcost",
-                                        value="Your timingcost is " + str(
-                                            timing_cost) + ". Find a etter host.")
+                                        value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. Find a [better host](https://www.birdflop.com).")
             except KeyError as key:
                 print("Missing: " + str(key))
 
@@ -159,15 +159,14 @@ class Timings(commands.Cog):
                 cpu = int(request["timingsMaster"]["system"]["cpu"])
                 if cpu == 1:
                     embed_var.add_field(name="❌ Threads",
-                                        value=f"You have only {cpu} thread. Find a better host.")
+                                        value=f"You have only {cpu} thread. Find a [better host](https://www.birdflop.com).")
                 if cpu == 2:
                     embed_var.add_field(name="❌ Threads",
-                                        value=f"You have only {cpu} threads. Find a better host.")
+                                        value=f"You have only {cpu} threads. Find a [better host](https://www.birdflop.com).")
             except KeyError as key:
                 print("Missing: " + str(key))
 
             try:
-                datapacks = request_raw["datapacks"]
                 handlers = request_raw["idmap"]["handlers"]
                 for handler in handlers:
                     handler_name = request_raw["idmap"]["handlers"][handler][1]
@@ -212,7 +211,8 @@ class Timings(commands.Cog):
 
             try:
                 for plugin in plugins:
-                    if "songoda" in request["timingsMaster"]["plugins"][plugin]["authors"].casefold():
+                    authors = request["timingsMaster"]["plugins"][plugin]["authors"]
+                    if authors is not None and "songoda" in request["timingsMaster"]["plugins"][plugin]["authors"].casefold():
                         if plugin == "EpicHeads":
                             embed_var.add_field(name="❌ EpicHeads",
                                                 value="This plugin was made by Songoda. Songoda resources are poorly developed and often cause problems. You should find an alternative such as [HeadsPlus](https://spigotmc.org/resources/headsplus-»-1-8-1-16-4.40265/) or [HeadDatabase](https://www.spigotmc.org/resources/head-database.14280/).")
@@ -227,23 +227,24 @@ class Timings(commands.Cog):
                 print("Missing: " + str(key))
 
             try:
-                using_ntvd = True
-                worlds = request_raw["worlds"]
-                tvd = None
-                for world in worlds:
-                    tvd = int(request_raw["worlds"][world]["ticking-distance"])
-                    ntvd = int(request_raw["worlds"][world]["notick-viewdistance"])
-                    if ntvd <= tvd and tvd >= 4:
-                        using_ntvd = False
-                if not using_ntvd:
-                    if spigot["world-settings"]["default"]["view-distance"] == "default":
-                        embed_var.add_field(name="❌ no-tick-view-distance",
-                                            value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
-                                                  f"And reduce view-distance from default ({tvd}) in [spigot.yml](http://bit.ly/spiconf). Recommended: 3.")
-                    else:
-                        embed_var.add_field(name="❌ no-tick-view-distance",
-                                            value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
-                                                  f"And reduce view-distance from {tvd} in [spigot.yml](http://bit.ly/spiconf). Recommended: 3.")
+                using_tweaks = "ViewDistanceTweaks" in plugins
+                if not using_tweaks:
+                    using_ntvd = True
+                    worlds = request_raw["worlds"]
+                    for world in worlds:
+                        tvd = int(request_raw["worlds"][world]["ticking-distance"])
+                        ntvd = int(request_raw["worlds"][world]["notick-viewdistance"])
+                        if ntvd <= tvd and tvd >= 4:
+                            using_ntvd = False
+                        if not using_ntvd:
+                            if spigot["world-settings"]["default"]["view-distance"] == "default":
+                                embed_var.add_field(name="❌ no-tick-view-distance",
+                                                    value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
+                                                          f"And reduce view-distance from default ({tvd}) in [spigot.yml](http://bit.ly/spiconf). Recommended: 3.")
+                            else:
+                                embed_var.add_field(name="❌ no-tick-view-distance",
+                                                    value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
+                                                          f"And reduce view-distance from {tvd} in [spigot.yml](http://bit.ly/spiconf). Recommended: 3.")
             except KeyError as key:
                 print("Missing: " + str(key))
 
