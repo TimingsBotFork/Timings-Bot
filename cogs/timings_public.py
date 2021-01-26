@@ -39,7 +39,7 @@ class Timings(commands.Cog):
             if word.startswith("https://www.spigotmc.org/go/timings?url=") or word.startswith(
                     "https://timings.spigotmc.org/?url="):
                 embed_var.add_field(name="❌ Spigot",
-                                    value="Spigot timings have limited information. Switch to [Purpur](https://purpur.pl3x.net/downloads) for better timings analysis.")
+                                    value="Spigot timings have limited information. Switch to [Paper](https://papermc.io/downloads) for better timings analysis.")
                 embed_var.url = word
                 await message.reply(embed=embed_var)
                 return
