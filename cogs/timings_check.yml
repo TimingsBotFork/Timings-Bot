@@ -12,18 +12,12 @@ servers:
   value: |-
     Yatopia is prone to bugs.
     Consider using [Purpur](https://ci.pl3x.net/job/Purpur/).
-- name: "Paper"
-  prefix: "||❌"
-  suffix: "||"
-  value: |-
-    ||Purpur has more optimizations but is generally less supported. 
-    Consider using [Purpur](https://ci.pl3x.net/job/Purpur/).||
 plugins:
   paper:
     ClearLag:
       prefix: "❌"
       value: |-
-        Plugins that claim to remove lag actually cause more lag. 
+        This plugin causes more lag than it prevents. 
     LagAssist:
       prefix: "❌"
       value: |-
@@ -32,19 +26,19 @@ plugins:
     NoChunkLag:
       prefix: "❌"
       value: |-
-        Plugins that claim to remove lag actually cause more lag. 
+        This plugin causes more lag than it prevents. 
     NoMobLag:
       prefix: "❌"
       value: |-
-        Plugins that claim to remove lag actually cause more lag.
+        This plugin causes more lag than it prevents.
     ServerBooster:
       prefix: "❌"
       value: |-
-        Plugins that claim to remove lag actually cause more lag. 
+        This plugin causes more lag than it prevents. 
     AntiLag:
       prefix: "❌"
       value: |-
-        Plugins that claim to remove lag actually cause more lag. 
+        This plugin causes more lag than it prevents. 
     BookLimiter:
       prefix: "❌"
       value: |-
@@ -77,13 +71,8 @@ plugins:
     FastAsyncWorldEdit:
       prefix: "❌"
       value: |-
-        FAWE has been known to cause issues.
+        FAWE can be unstable. Make sure you know what you are doing in a production environment. 
         Consider replacing FAWE with [Worldedit](https://enginehub.org/worldedit/#downloads).
-    CMI:
-      prefix: "❌"
-      value: |-
-        CMI is a buggy plugin. 
-        Consider replacing CMI with [EssentialsX](https://essentialsx.net/downloads.html).
     IllegalStack:
       prefix: "❌"
       value: |-
