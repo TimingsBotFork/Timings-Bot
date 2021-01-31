@@ -1,5 +1,5 @@
 # Botflop
-[Click here](https://discord.com/api/oauth2/authorize?client_id=787929894616825867&permissions=0&scope=bot) to invite hte original Botflop to your server
+[Click here](https://discord.com/api/oauth2/authorize?client_id=787929894616825867&permissions=0&scope=bot) to invite the original Botflop to your server
 
 # Current abilities
 ## Analyze timings reports
