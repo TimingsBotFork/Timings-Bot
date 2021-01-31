@@ -28,8 +28,11 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 @bot.event
 async def on_ready():
-    # Marks bot as running
-    logging.info('I am running.')
+    await bot.change_presence(activity=discord.Game('Fork of the original timings bot'))
+    logging.info('Connected to bot: {}'.format(bot.user.name))
+    logging.info('Bot ID: {}'.format(bot.user.id))
+    logging.info('Bot fully loaded')
+    logging.info('Original creators: https://github.com/Pemigrade/botflop')
 
 @bot.event
 async def on_message(message):
@@ -50,10 +53,10 @@ async def on_message(message):
                         if len(text) > 100000:
                             text = text[:99999]
                             truncated = True
-                        req = requests.post('https://bin.birdflop.com/documents', data=text)
+                        req = requests.post('https://hastebin.com/documents', data=text)
                         key = json.loads(req.content)['key']
                         response = ""
-                        response = response + "https://bin.birdflop.com/" + key
+                        response = response + "https://hastebin.com/" + key
                         response = response + "\nRequested by " + message.author.mention
                         if truncated:
                             response = response + "\n(file was truncated because it was too long.)"
@@ -66,7 +69,7 @@ async def on_message(message):
 
 @bot.command()
 async def ping(ctx):
-    await ctx.send(f'Birdflop bot ping is {round(bot.latency * 1000)}ms')
+    await ctx.send(f'Kahti bot ping is {round(bot.latency * 1000)}ms')
 
 @bot.command(name="react", pass_context=True)
 @has_permissions(administrator=True)
