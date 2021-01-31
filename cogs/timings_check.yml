@@ -42,7 +42,7 @@ plugins:
     BookLimiter:
       prefix: "❌"
       value: |-
-        You don't need BookLimiter as Paper already has its features.
+        You don't need BookLimiter as Paper already fixes all crash bugs.
     LimitPillagers:
       prefix: "❌"
       value: |-
@@ -55,24 +55,19 @@ plugins:
     StackMob:
       prefix: "❌"
       value: |-
-        Stacking plugins actually cause more lag. 
+        Stacking mobs causes more lag.
     Stacker:
       prefix: "❌"
       value: |-
-        Stacking plugins actually cause more lag. 
+        Stacking mobs causes more lag.
     MobStacker:
       prefix: "❌"
       value: |-
-        Stacking plugins actually cause more lag. 
+        Stacking mobs causes more lag.
     WildStacker:
       prefix: "❌"
       value: |-
-        Stacking plugins actually cause more lag. 
-    SuggestionBlocker:
-      prefix: "❌"
-      value: |-
-        You probably don't need SuggestionBlocker as Spigot already adds its features. 
-        Set tab-complete to -1 in [spigot.yml](http://bit.ly/spiconf).
+        Stacking mobs causes more lag.
     FastAsyncWorldEdit:
       prefix: "❌"
       value: |-
@@ -81,11 +76,11 @@ plugins:
     IllegalStack:
       prefix: "❌"
       value: |-
-        You probably don't need IllegalStack for survival servers as Paper already has its features.
+        You probably don't need IllegalStack as Paper already fixes all dupe and crash bugs.
     ExploitFixer:
       prefix: "❌"
       value: |-
-        You probably don't need ExploitFixer as Paper already has its features. 
+        You probably don't need ExploitFixer as Paper already fixes all dupe and crash bugs.
     EntityTrackerFixer:
       prefix: "❌"
       value: |-
@@ -155,11 +150,6 @@ config:
       - spigot["settings"]["bungeecord"] == "false"
       prefix: "❌"
       value: "Increase this in [server.properties](http://bit.ly/servprop). Recommended: 512."
-    - expressions:
-      - int(server_properties["network-compression-threshold"]) != -1
-      - spigot["settings"]["bungeecord"] == "true"
-      prefix: "❌"
-      value: "Set this to -1 in [server.properties](http://bit.ly/servprop) for a bungee server like yours."
   bukkit:
     chunk-gc.period-in-ticks:
     - expressions:
@@ -202,7 +192,7 @@ config:
       - int(server_properties["view-distance"]) >= 10
       - spigot["world-settings"]["default"]["view-distance"] == "default"
       prefix: "❌"
-      value: "Decrease this from default (10) in [spigot.yml](http://bit.ly/spiconf).\nRecommended: 3."
+      value: "Decrease this from default (10) in [spigot.yml](http://bit.ly/spiconf).\nRecommended: 4."
     entity-activation-range.animals:
     - expressions:
       - int(spigot["world-settings"]["default"]["entity-activation-range"]["animals"]) >= 32
@@ -409,11 +399,6 @@ config:
       - paper["world-settings"]["default"]["alt-item-despawn-rate"]["enabled"] == "false"
       prefix: "❌"
       value: "Enable this in [paper.yml](http://bit.ly/paperconf)."
-    enable-treasure-maps:
-    - expressions:
-      - paper["world-settings"]["default"]["enable-treasure-maps"] == "true"
-      prefix: "❌"
-      value: "Disable this in [paper.yml](http://bit.ly/paperconf). Generating treasure maps can be extremely expensive if the structure it's trying to locate is far away."
     entity-per-chunk-save-limit.experience_orb:
     - expressions:
       - int(paper["world-settings"]["default"]["entity-per-chunk-save-limit"]["experience_orb"]) == -1
@@ -449,11 +434,6 @@ config:
     settings.dont-send-useless-entity-packets:
     - expressions:
       - purpur["settings"]["dont-send-useless-entity-packets"] == "false"
-      prefix: "❌"
-      value: "Enable this in [purpur.yml](http://bit.ly/purpurc)."
-    mobs.dolphin.disable-treasure-searching:
-    - expressions:
-      - purpur["world-settings"]["default"]["mobs"]["dolphin"]["disable-treasure-searching"] == "false"
       prefix: "❌"
       value: "Enable this in [purpur.yml](http://bit.ly/purpurc)."
     mobs.villager.brain-ticks:
