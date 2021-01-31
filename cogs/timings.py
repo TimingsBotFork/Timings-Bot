@@ -90,7 +90,7 @@ class Timings(commands.Cog):
                 timing_cost = int(request["timingsMaster"]["system"]["timingcost"])
                 if timing_cost > 300:
                     embed_var.add_field(name="❌ Timingcost",
-                                        value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. Find a better host.")
+                                        value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. Find a [better host](https://www.birdflop.com).")
             except KeyError as key:
                 print("Missing: " + str(key))
 
@@ -117,7 +117,8 @@ class Timings(commands.Cog):
                     if "XX:G1MixedGCCountTarget=4" not in flags:
                         embed_var.add_field(name="❌ Outdated Flags",
                                             value="Add `-XX:G1MixedGCCountTarget=4` to flags.")
-                    if "-XX:+UseG1GC" not in flags:
+                    jvm_version = request["timingsMaster"]["system"]["jvmversion"]
+                    if "-XX:+UseG1GC" not in flags and jvm_version.startswith("1.8."):
                         embed_var.add_field(name="❌ Aikar's Flags",
                                             value="You must use G1GC when using Aikar's flags.")
                     if "-Xmx" in flags:
@@ -159,10 +160,10 @@ class Timings(commands.Cog):
                 cpu = int(request["timingsMaster"]["system"]["cpu"])
                 if cpu == 1:
                     embed_var.add_field(name="❌ Threads",
-                                        value=f"You have only {cpu} thread. Find a better host.")
+                                        value=f"You have only {cpu} thread. Find a [better host](https://www.birdflop.com).")
                 if cpu == 2:
                     embed_var.add_field(name="❌ Threads",
-                                        value=f"You have only {cpu} threads. Find a better host.")
+                                        value=f"You have only {cpu} threads. Find a [better host](https://www.birdflop.com).")
             except KeyError as key:
                 print("Missing: " + str(key))
 
@@ -233,15 +234,15 @@ class Timings(commands.Cog):
                     for world in worlds:
                         tvd = int(request_raw["worlds"][world]["ticking-distance"])
                         ntvd = int(request_raw["worlds"][world]["notick-viewdistance"])
-                        if ntvd <= tvd and tvd >= 4:
+                        if ntvd <= tvd and tvd >= 5:
                             if spigot["world-settings"]["default"]["view-distance"] == "default":
                                 embed_var.add_field(name="❌ no-tick-view-distance",
                                                     value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
-                                                          f"And reduce view-distance from default ({tvd}) in [spigot.yml](http://bit.ly/spiconf). Recommended: 3.")
+                                                          f"And reduce view-distance from default ({tvd}) in [spigot.yml](http://bit.ly/spiconf). Recommended: 4.")
                             else:
                                 embed_var.add_field(name="❌ no-tick-view-distance",
                                                     value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
-                                                          f"And reduce view-distance from {tvd} in [spigot.yml](http://bit.ly/spiconf). Recommended: 3.")
+                                                          f"And reduce view-distance from {tvd} in [spigot.yml](http://bit.ly/spiconf). Recommended: 4.")
                             break
             except KeyError as key:
                 print("Missing: " + str(key))
@@ -317,6 +318,11 @@ def eval_field(embed_var, option, option_name, plugins, server_properties, bukki
                     print(value_error)
                     embed_var.add_field(name="❗ Value Error",
                                         value=f'`{value_error}`\nexpression:\n`{expression}`\noption:\n`{option_name}`')
+                except TypeError as type_error:
+                    add_to_field = False
+                    print(type_error)
+                    embed_var.add_field(name="❗ Type Error",
+                                        value=f'`{type_error}`\nexpression:\n`{expression}`\noption:\n`{option_name}`')
             for config_name in dict_of_vars:
                 if config_name in option_data["value"] and not dict_of_vars[config_name]:
                     add_to_field = False
