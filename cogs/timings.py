@@ -134,6 +134,24 @@ class Timings(commands.Cog):
                         if int(max_mem) < 5400:
                             embed_var.add_field(name="❌ Low Memory",
                                                 value="Allocate at least 6-10GB of ram to your server if you can afford it.")
+                        index = 0
+                        max_online_players = 0
+                        while index < len(request["timingsMaster"]["data"]):
+                            timed_ticks = request["timingsMaster"]["data"][index]["minuteReports"][0]["ticks"][
+                                "timedTicks"]
+                            player_ticks = request["timingsMaster"]["data"][index]["minuteReports"][0]["ticks"][
+                                "playerTicks"]
+                            players = (player_ticks / timed_ticks)
+                            max_online_players = max(players, max_online_players)
+                            index = index + 1
+                        if 1000 * max_online_players / int(max_mem) > 5 and int(max_mem) < 12000:
+                            if max_online_players < 80:
+                                embed_var.add_field(name="❌ Low memory",
+                                                    value="You should be using more RAM with this many players.")
+                            else:
+                                embed_var.add_field(name="❌ Low memory",
+                                                    value="You should be using more RAM with this many players. Consider getting a dedicated server.")
+
                         if "-Xms" in flags:
                             min_mem = 0
                             flaglist = flags.split(" ")
@@ -161,7 +179,7 @@ class Timings(commands.Cog):
                 if cpu == 1:
                     embed_var.add_field(name="❌ Threads",
                                         value=f"You have only {cpu} thread. Find a better host.")
-                if cpu == 2:
+                if cpu == 2 or cpu == 3:
                     embed_var.add_field(name="❌ Threads",
                                         value=f"You have only {cpu} threads. Find a better host.")
             except KeyError as key:
@@ -250,8 +268,7 @@ class Timings(commands.Cog):
             try:
                 normal_ticks = request["timingsMaster"]["data"][0]["totalTicks"]
                 worst_tps = 20
-                index = 0
-                while index < len(request["timingsMaster"]["data"]):
+                for index in range(len(request["timingsMaster"]["data"])):
                     total_ticks = request["timingsMaster"]["data"][index]["totalTicks"]
                     if total_ticks == normal_ticks:
                         end_time = request["timingsMaster"]["data"][index]["end"]
@@ -259,7 +276,6 @@ class Timings(commands.Cog):
                         tps = total_ticks / (end_time - start_time)
                         if tps < worst_tps:
                             worst_tps = tps
-                    index = index + 1
                 if worst_tps < 10:
                     red = 255
                     green = int(255 * (0.1 * worst_tps))

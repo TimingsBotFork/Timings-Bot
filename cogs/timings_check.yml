@@ -34,11 +34,11 @@ plugins:
     ServerBooster:
       prefix: "❌"
       value: |-
-        This plugin causes more lag than it prevents. 
+        This plugin causes more lag than it prevents.
     AntiLag:
       prefix: "❌"
       value: |-
-        This plugin causes more lag than it prevents. 
+        This plugin causes more lag than it prevents.
     BookLimiter:
       prefix: "❌"
       value: |-
@@ -71,7 +71,7 @@ plugins:
     FastAsyncWorldEdit:
       prefix: "❌"
       value: |-
-        FAWE can be unstable. Make sure you know what you are doing in a production environment. 
+        FAWE can be unstable. Make sure you know what you are doing in a production environment.
         Consider replacing FAWE with [Worldedit](https://enginehub.org/worldedit/#downloads).
     IllegalStack:
       prefix: "❌"

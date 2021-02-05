@@ -28,6 +28,7 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
 @bot.event
 async def on_ready():
+    # Marks bot as running
     await bot.change_presence(activity=discord.Game('Fork of the original timings bot'))
     logging.info('Connected to bot: {}'.format(bot.user.name))
     logging.info('Bot ID: {}'.format(bot.user.id))
@@ -39,7 +40,7 @@ async def on_message(message):
     # Binflop
     if len(message.attachments) > 0:
         if not message.attachments[0].url.endswith(
-                ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image')):
+                ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg')):
             download = message.attachments[0].url
             async with aiohttp.ClientSession() as session:
                 async with session.get(download, allow_redirects=True) as r:
@@ -53,10 +54,10 @@ async def on_message(message):
                         if len(text) > 100000:
                             text = text[:99999]
                             truncated = True
-                        req = requests.post('https://hastebin.com/documents', data=text)
+                        req = requests.post('https://bin.bloom.host/documents', data=text)
                         key = json.loads(req.content)['key']
                         response = ""
-                        response = response + "https://hastebin.com/" + key
+                        response = response + "https://bin.bloom.host/" + key
                         response = response + "\nRequested by " + message.author.mention
                         if truncated:
                             response = response + "\n(file was truncated because it was too long.)"
