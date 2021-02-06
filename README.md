@@ -6,7 +6,7 @@ Fork of the original timings bot from
 We manually reguraly upstream their changes.
 
 
-# [Invite The Bot (ClickHere)](https://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=68608&scope=bot)
+## [Invite The Bot (Click Here)](https://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=68608&scope=bot)
 
 
 # Current abilities:
