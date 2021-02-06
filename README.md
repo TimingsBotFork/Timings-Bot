@@ -1,5 +1,7 @@
-# Botflop
-[Click here](https://discord.com/api/oauth2/authorize?client_id=787929894616825867&permissions=0&scope=bot) to invite the original Botflop to your server
+# Kahti
+Fork of the original timings bot from [Botflop](https://github.com/Pemigrade/botflop).
+
+# [Invite The Bot](https://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=68608&scope=bot)
 
 # Current abilities
 ## Analyze timings reports
@@ -14,4 +16,4 @@ Botflop converts text files into bin links. You can try it out yourself on our [
 
 ## In Progress
 * `.update` command to update either all available plugins to the latest version or just one plugin
-* ability to fix all timings recommendations with one click or one click per recommendation
+* ability to fix all timings recommendations with one click or one click per recommend
