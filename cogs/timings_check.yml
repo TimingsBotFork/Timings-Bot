@@ -17,7 +17,7 @@ plugins:
     ClearLag:
       prefix: "❌"
       value: |-
-        This plugin causes more lag than it prevents. 
+        This plugin causes more lag than it prevents.
     LagAssist:
       prefix: "❌"
       value: |-
@@ -26,7 +26,7 @@ plugins:
     NoChunkLag:
       prefix: "❌"
       value: |-
-        This plugin causes more lag than it prevents. 
+        This plugin causes more lag than it prevents.
     NoMobLag:
       prefix: "❌"
       value: |-
@@ -451,11 +451,6 @@ config:
       - purpur["world-settings"]["default"]["mobs"]["zombie"]["aggressive-towards-villager-when-lagging"] == "true"
       prefix: "❌"
       value: "Disable this in [purpur.yml](http://bit.ly/purpurc)."
-    gameplay-mechanics.entities-can-use-portals:
-    - expressions:
-      - purpur["world-settings"]["default"]["gameplay-mechanics"]["entities-can-use-portals"] == "true"
-      prefix: "❌"
-      value: "Disable this in [purpur.yml](http://bit.ly/purpurc) to prevent players from creating chunk anchors."
     mobs.villager.lobotomize.enabled:
     - expressions:
       - purpur["world-settings"]["default"]["mobs"]["villager"]["lobotomize"]["enabled"] == "false"
