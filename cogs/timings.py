@@ -27,7 +27,7 @@ class Timings(commands.Cog):
         words = message.content.replace("\n", " ").split(" ")
         timings_url = ""
         embed_var = discord.Embed(title=self.TIMINGS_TITLE)
-        embed_var.set_footer(text=f"Please note that these options are renerally going for the minimum. Adjust them to match your server. Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
+        embed_var.set_footer(text=f"Please note that these options are generally going for the minimum. Adjust them to match your server. Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
 
         for word in words:
             if word.startswith("https://timin") and "/d=" in word:
@@ -278,10 +278,10 @@ class Timings(commands.Cog):
                             worst_tps = tps
                 if worst_tps < 10:
                     red = 255
-                    green = int(255 * (0.1 * worst_tps))
+                    green = int(205 * (0.1 * worst_tps))
                 else:
-                    red = int(255 * (-0.1 * worst_tps + 2))
-                    green = 255
+                    red = int(205 * (-0.1 * worst_tps + 2))
+                    green = 205
                 color = int(red*256*256 + green*256)
                 embed_var.color = color
             except KeyError as key:
