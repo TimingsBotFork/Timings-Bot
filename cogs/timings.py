@@ -27,7 +27,7 @@ class Timings(commands.Cog):
         words = message.content.replace("\n", " ").split(" ")
         timings_url = ""
         embed_var = discord.Embed(title=self.TIMINGS_TITLE)
-        embed_var.set_footer(text=f"Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
+        embed_var.set_footer(text=f"Please note that these options are renerally going for the minimum. Adjust them to match your server. Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
 
         for word in words:
             if word.startswith("https://timin") and "/d=" in word:
@@ -39,7 +39,7 @@ class Timings(commands.Cog):
             if word.startswith("https://www.spigotmc.org/go/timings?url=") or word.startswith(
                     "https://timings.spigotmc.org/?url="):
                 embed_var.add_field(name="❌ Spigot",
-                                    value="Spigot timings have limited information. Switch to [Purpur](https://purpur.pl3x.net/downloads) for better timings analysis.")
+                                    value="Spigot timings have limited information. Switch to [Paper](https://papermc.io/) for better timings analysis.")
                 embed_var.url = word
                 await message.reply(embed=embed_var)
                 return
@@ -88,7 +88,7 @@ class Timings(commands.Cog):
 
             try:
                 timing_cost = int(request["timingsMaster"]["system"]["timingcost"])
-                if timing_cost > 300:
+                if timing_cost > 200:
                     embed_var.add_field(name="❌ Timingcost",
                                         value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. Find a better host.")
             except KeyError as key:
