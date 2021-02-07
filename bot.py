@@ -29,7 +29,7 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 @bot.event
 async def on_ready():
     # Marks bot as running
-    await bot.change_presence(activity=discord.Game('Fork of the original timings bot'))
+    await bot.change_presence(activity=discord.Game('Reading your timing reports'))
     logging.info('Connected to bot: {}'.format(bot.user.name))
     logging.info('Bot ID: {}'.format(bot.user.id))
     logging.info('Bot fully loaded')
