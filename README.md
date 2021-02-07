@@ -5,6 +5,10 @@ Fork of the original timings bot from
 
 We manually reguraly upstream their changes.
 
+Test out the bot: [Click Here](https://discord.hahota.fun)
+
+Support discord: [Click Here](https://discord.gg/4kGgyCmKwp)
+
 
 ## [Invite The Bot (Click Here)](https://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=68608&scope=bot)
 
