@@ -73,8 +73,8 @@ async def ping(ctx):
     await ctx.send(f'Kahti bot ping is {round(bot.latency * 1000)}ms')
 
 @bot.command()
-async def ping(ctx):
-    await ctx.send('Invite me with this link:/nhttps://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=68608&scope=bot')
+async def invite(ctx):
+    await ctx.send('Invite me with this link:/nhttps://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=0&scope=bot')
 
 @bot.command(name="react", pass_context=True)
 @has_permissions(administrator=True)
