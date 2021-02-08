@@ -1,8 +1,9 @@
 import discord
 from discord.ext import commands
-import requests
+import aiohttp
 import yaml
 import re
+import logging
 
 TIMINGS_CHECK = None
 YAML_ERROR = None
@@ -10,7 +11,7 @@ with open("cogs/timings_check.yml", 'r', encoding="utf8") as stream:
     try:
         TIMINGS_CHECK = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
-        print(exc)
+        logging.info(exc)
         YAML_ERROR = exc
 
 VERSION_REGEX = re.compile(r"\d+\.\d+\.\d+")
@@ -50,14 +51,17 @@ class Timings(commands.Cog):
             timings_url = timings_url.split("#")[0]
         if "?id=" not in timings_url:
             return
-        print(timings_url)
+        logging.info(timings_url)
 
         timings_host, timings_id = timings_url.split("?id=")
         timings_json = timings_host + "data.php?id=" + timings_id
         timings_url_raw = timings_url + "&raw=1"
 
-        request_raw = requests.get(timings_url_raw).json()
-        request = requests.get(timings_json).json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(timings_url_raw) as response:
+                request_raw = await response.json(content_type=None)
+            async with session.get(timings_json) as response:
+                request = await response.json(content_type=None)
         if request is None or request_raw is None:
             embed_var.add_field(name="❌ Invalid report",
                                 value="Create a new timings report.")
@@ -73,7 +77,7 @@ class Timings(commands.Cog):
                     if version_result:
                         if compare_versions(version_result, TIMINGS_CHECK["version"]) == -1:
                             version = version.replace("git-", "").replace("MC: ", "")
-                            embed_var.add_field(name="❌ Legacy Build",
+                            embed_var.add_field(name="❌ Outdated",
                                                 value=f'You are using `{version}`. Update to `{TIMINGS_CHECK["version"]}`.')
                     else:
                         embed_var.add_field(name="❗ Value Error",
@@ -84,15 +88,15 @@ class Timings(commands.Cog):
                             embed_var.add_field(**create_field(server))
                             break
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
             try:
                 timing_cost = int(request["timingsMaster"]["system"]["timingcost"])
-                if timing_cost > 200:
+                if timing_cost > 300:
                     embed_var.add_field(name="❌ Timingcost",
                                         value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. Find a better host.")
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
             try:
                 jvm_version = request["timingsMaster"]["system"]["jvmversion"]
@@ -100,7 +104,7 @@ class Timings(commands.Cog):
                     embed_var.add_field(name="❌ Java Version",
                                         value=f"You are using Java {jvm_version}. Update to [Java 11](https://adoptopenjdk.net/installation.html).")
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
             try:
                 flags = request["timingsMaster"]["system"]["flags"]
@@ -109,7 +113,20 @@ class Timings(commands.Cog):
                     java_version = jvm_version.split(".")[0]
                     if int(java_version) < 14:
                         embed_var.add_field(name="❌ Java " + java_version,
-                                            value="If you are going to use ZGC, you should also use Java 14+.")
+                                            value="ZGC should only be used on Java 15.")
+                    if "-Xmx" in flags:
+                        max_mem = 0
+                        flaglist = flags.split(" ")
+                        for flag in flaglist:
+                            if flag.startswith("-Xmx"):
+                                max_mem = flag.split("-Xmx")[1]
+                                max_mem = max_mem.replace("G", "000")
+                                max_mem = max_mem.replace("M", "")
+                                max_mem = max_mem.replace("g", "000")
+                                max_mem = max_mem.replace("m", "")
+                                if int(max_mem) < 10000:
+                                    embed_var.add_field(name="❌ Low Memory",
+                                                        value="ZGC is only good with a lot of memory.")
                 elif "-Daikars.new.flags=true" in flags:
                     if "-XX:+PerfDisableSharedMem" not in flags:
                         embed_var.add_field(name="❌ Outdated Flags",
@@ -144,14 +161,9 @@ class Timings(commands.Cog):
                             players = (player_ticks / timed_ticks)
                             max_online_players = max(players, max_online_players)
                             index = index + 1
-                        if 1000 * max_online_players / int(max_mem) > 5 and int(max_mem) < 12000:
-                            if max_online_players < 80:
-                                embed_var.add_field(name="❌ Low memory",
-                                                    value="You should be using more RAM with this many players.")
-                            else:
-                                embed_var.add_field(name="❌ Low memory",
-                                                    value="You should be using more RAM with this many players. Consider getting a dedicated server.")
-
+                        if 1000 * max_online_players / int(max_mem) > 6 and int(max_mem) < 10000:
+                            embed_var.add_field(name="❌ Low memory",
+                                                value="You should be using more RAM with this many players.")
                         if "-Xms" in flags:
                             min_mem = 0
                             flaglist = flags.split(" ")
@@ -172,7 +184,7 @@ class Timings(commands.Cog):
                     embed_var.add_field(name="❌ Aikar's Flags",
                                         value="Use [Aikar's flags](https://aikar.co/2018/07/02/tuning-the-jvm-g1gc-garbage-collector-flags-for-minecraft/).")
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
             try:
                 cpu = int(request["timingsMaster"]["system"]["cpu"])
@@ -183,7 +195,7 @@ class Timings(commands.Cog):
                     embed_var.add_field(name="❌ Threads",
                                         value=f"You have only {cpu} threads. Find a better host.")
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
             try:
                 handlers = request_raw["idmap"]["handlers"]
@@ -194,7 +206,7 @@ class Timings(commands.Cog):
                         embed_var.add_field(name=f"❌ {handler_name}",
                                             value=f"This datapack uses command functions which are laggy.")
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
             plugins = request["timingsMaster"]["plugins"] if "plugins" in request["timingsMaster"] else None
             server_properties = request["timingsMaster"]["config"]["server.properties"] if "server.properties" in request["timingsMaster"]["config"] else None
@@ -243,7 +255,7 @@ class Timings(commands.Cog):
                             embed_var.add_field(name="❌ " + plugin,
                                                 value="This plugin was made by Songoda. Songoda resources are poorly developed and often cause problems. You should find an alternative.")
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
             try:
                 using_tweaks = "ViewDistanceTweaks" in plugins
@@ -263,7 +275,7 @@ class Timings(commands.Cog):
                                                           f"And reduce view-distance from {tvd} in [spigot.yml](http://bit.ly/spiconf). Recommended: 4.")
                             break
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
             try:
                 normal_ticks = request["timingsMaster"]["data"][0]["totalTicks"]
@@ -285,10 +297,10 @@ class Timings(commands.Cog):
                 color = int(red*256*256 + green*256)
                 embed_var.color = color
             except KeyError as key:
-                print("Missing: " + str(key))
+                logging.info("Missing: " + str(key))
 
         except ValueError as value_error:
-            print(value_error)
+            logging.info(value_error)
             embed_var.add_field(name="❗ Value Error",
                                 value=value_error)
 
@@ -331,12 +343,12 @@ def eval_field(embed_var, option, option_name, plugins, server_properties, bukki
                         break
                 except ValueError as value_error:
                     add_to_field = False
-                    print(value_error)
+                    logging.info(value_error)
                     embed_var.add_field(name="❗ Value Error",
                                         value=f'`{value_error}`\nexpression:\n`{expression}`\noption:\n`{option_name}`')
                 except TypeError as type_error:
                     add_to_field = False
-                    print(type_error)
+                    logging.info(type_error)
                     embed_var.add_field(name="❗ Type Error",
                                         value=f'`{type_error}`\nexpression:\n`{expression}`\noption:\n`{option_name}`')
             for config_name in dict_of_vars:
@@ -351,7 +363,7 @@ def eval_field(embed_var, option, option_name, plugins, server_properties, bukki
                 break
 
     except KeyError as key:
-        print("Missing: " + str(key))
+        logging.info("Missing: " + str(key))
 
 
 def create_field(option):
