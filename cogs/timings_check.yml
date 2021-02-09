@@ -384,6 +384,8 @@ config:
     armor-stands-tick:
     - expressions:
       - paper["world-settings"]["default"]["armor-stands-tick"] == "true"
+      - '"Train_Carts" not in plugins'
+      - '"Animatronics" not in plugins'
       - '"PetBlocks" not in plugins'
       - '"BlockBalls" not in plugins'
       - '"ArmorStandTools" not in plugins'
