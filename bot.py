@@ -21,7 +21,7 @@ if use_wiki_commands:
           if wikis[key] not in use_wikis:
               wikis[key] = "none"
       wiki.set_wiki(wikis)
-   except ImportError:
+    except ImportError:
       print("Unable to import wiki functions. Is the file in your directory?")
 
 # Import subprocess
