@@ -57,6 +57,12 @@ def set_wikis(wiki):
     global wikis
     wikis = wiki
 
+def toggle_keys(keys):
+    for key in wikis.keys():
+        if wikis[key] not in keys:
+            wikis[key] = "none"
+    wiki.set_wiki(wikis)
+
 """ Wiki variable description
     _path describes the main directory path
     _pages is a dictionary of all subsequent pages.
