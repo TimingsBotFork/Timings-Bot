@@ -15,14 +15,10 @@ use_wiki_commands = True # toggle
 use_wikis = ["example"]  # specific toggle (included => on)
 if use_wiki_commands:
     try:
-      import wiki
-      wikis = wiki.get_wikis()
-      for key in wikis.keys():
-          if wikis[key] not in use_wikis:
-              wikis[key] = "none"
-      wiki.set_wiki(wikis)
+        import wiki
+        wiki.toggle_keys(use_wikis)
     except ImportError:
-      print("Unable to import wiki functions. Is the file in your directory?")
+        print("Unable to import wiki functions. Is the file in your directory?")
 
 # Import subprocess
 bot = commands.Bot(command_prefix=".", intents=discord.Intents.default(),
@@ -85,7 +81,7 @@ async def ping(ctx):
 @bot.command()
 async def get_wiki(ctx, *args):
     if use_wiki_commands:
-        wiki(ctx, *args)
+        wiki.wiki(ctx, *args)
 
 @bot.command()
 async def invite(ctx):
