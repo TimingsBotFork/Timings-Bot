@@ -28,7 +28,8 @@ class Timings(commands.Cog):
         words = message.content.replace("\n", " ").split(" ")
         timings_url = ""
         embed_var = discord.Embed(title=self.TIMINGS_TITLE)
-        embed_var.set_footer(text=f"Please note that these options are generally going for the minimum. Adjust them to match your server. Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
+        embed_var.set_footer(
+            text=f"Please note that these options are generally going for the minimum. Adjust them to match your server. Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
 
         for word in words:
             if word.startswith("https://timin") and "/d=" in word:
@@ -76,7 +77,8 @@ class Timings(commands.Cog):
                     version_result = version_result.group() if version_result else None
                     if version_result:
                         if compare_versions(version_result, TIMINGS_CHECK["version"]) == -1:
-                            version = version.replace("git-", "").replace("MC: ", "")
+                            version = version.replace(
+                                "git-", "").replace("MC: ", "")
                             embed_var.add_field(name="❌ Outdated",
                                                 value=f'You are using `{version}`. Update to `{TIMINGS_CHECK["version"]}`.')
                     else:
@@ -91,7 +93,8 @@ class Timings(commands.Cog):
                 logging.info("Missing: " + str(key))
 
             try:
-                timing_cost = int(request["timingsMaster"]["system"]["timingcost"])
+                timing_cost = int(
+                    request["timingsMaster"]["system"]["timingcost"])
                 if timing_cost > 300:
                     embed_var.add_field(name="❌ Timingcost",
                                         value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. Find a better host.")
@@ -159,7 +162,8 @@ class Timings(commands.Cog):
                             player_ticks = request["timingsMaster"]["data"][index]["minuteReports"][0]["ticks"][
                                 "playerTicks"]
                             players = (player_ticks / timed_ticks)
-                            max_online_players = max(players, max_online_players)
+                            max_online_players = max(
+                                players, max_online_players)
                             index = index + 1
                         if 1000 * max_online_players / int(max_mem) > 6 and int(max_mem) < 10000:
                             embed_var.add_field(name="❌ Low memory",
@@ -202,14 +206,16 @@ class Timings(commands.Cog):
                 for handler in handlers:
                     handler_name = request_raw["idmap"]["handlers"][handler][1]
                     if handler_name.startswith("Command Function - ") and handler_name.endswith(":tick"):
-                        handler_name = handler_name.split("Command Function - ")[1].split(":tick")[0]
+                        handler_name = handler_name.split(
+                            "Command Function - ")[1].split(":tick")[0]
                         embed_var.add_field(name=f"❌ {handler_name}",
                                             value=f"This datapack uses command functions which are laggy.")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
             plugins = request["timingsMaster"]["plugins"] if "plugins" in request["timingsMaster"] else None
-            server_properties = request["timingsMaster"]["config"]["server.properties"] if "server.properties" in request["timingsMaster"]["config"] else None
+            server_properties = request["timingsMaster"]["config"][
+                "server.properties"] if "server.properties" in request["timingsMaster"]["config"] else None
             bukkit = request["timingsMaster"]["config"]["bukkit"] if "bukkit" in request["timingsMaster"]["config"] else None
             spigot = request["timingsMaster"]["config"]["spigot"] if "spigot" in request["timingsMaster"]["config"] else None
             paper = request["timingsMaster"]["config"]["paper"] if "paper" in request["timingsMaster"]["config"] else None
@@ -225,7 +231,8 @@ class Timings(commands.Cog):
                                         stored_plugin = TIMINGS_CHECK["plugins"][server_name][plugin_name]
                                         if isinstance(stored_plugin, dict):
                                             stored_plugin["name"] = plugin_name
-                                            embed_var.add_field(**create_field(stored_plugin))
+                                            embed_var.add_field(
+                                                **create_field(stored_plugin))
                                         else:
                                             eval_field(embed_var, stored_plugin, plugin_name, plugins,
                                                        server_properties, bukkit, spigot, paper, tuinity, purpur)
@@ -262,8 +269,10 @@ class Timings(commands.Cog):
                 if not using_tweaks:
                     worlds = request_raw["worlds"]
                     for world in worlds:
-                        tvd = int(request_raw["worlds"][world]["ticking-distance"])
-                        ntvd = int(request_raw["worlds"][world]["notick-viewdistance"])
+                        tvd = int(request_raw["worlds"]
+                                  [world]["ticking-distance"])
+                        ntvd = int(request_raw["worlds"]
+                                   [world]["notick-viewdistance"])
                         if ntvd <= tvd and tvd >= 5:
                             if spigot["world-settings"]["default"]["view-distance"] == "default":
                                 embed_var.add_field(name="❌ no-tick-view-distance",
@@ -274,6 +283,20 @@ class Timings(commands.Cog):
                                                     value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
                                                           f"And reduce view-distance from {tvd} in [spigot.yml](http://bit.ly/spiconf). Recommended: 4.")
                             break
+            except KeyError as key:
+                logging.info("Missing: " + str(key))
+
+            try:
+                worlds = request_raw["worlds"]
+                high_mec = False
+                for world in worlds:
+                    max_entity_cramming = int(
+                        request_raw["worlds"][world]["gamerules"]["maxEntityCramming"])
+                    if max_entity_cramming >= 24:
+                        high_mec = True
+                if high_mec:
+                    embed_var.add_field(name="❌ maxEntityCramming",
+                                        value=f"Decrease this by running the /gamerule command in each world. Recommended: 8. ")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
@@ -359,7 +382,8 @@ def eval_field(embed_var, option, option_name, plugins, server_properties, bukki
                 """ f strings don't like newlines so we replace the newlines with placeholder text before we eval """
                 option_data["value"] = eval('f"""' + option_data["value"].replace("\n", "\\|n\\") + '"""').replace(
                     "\\|n\\", "\n")
-                embed_var.add_field(**create_field({**{"name": option_name}, **option_data}))
+                embed_var.add_field(
+                    **create_field({**{"name": option_name}, **option_data}))
                 break
 
     except KeyError as key:

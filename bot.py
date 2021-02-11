@@ -35,6 +35,7 @@ async def on_ready():
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
 
+
 @bot.event
 async def on_message(message):
     # Binflop
@@ -54,27 +55,33 @@ async def on_message(message):
                         if len(text) > 100000:
                             text = text[:99999]
                             truncated = True
-                        req = requests.post('https://bin.bloom.host/documents', data=text)
+                        req = requests.post(
+                            'https://bin.bloom.host/documents', data=text)
                         key = json.loads(req.content)['key']
                         response = ""
                         response = response + "https://bin.bloom.host/" + key
                         response = response + "\nRequested by " + message.author.mention
                         if truncated:
-                            response = response + "\n(file was truncated because it was too long.)"
-                        embed_var = discord.Embed(title="Please use a paste service", color=0x1D83D4)
+                            response = response + \
+                                "\n(file was truncated because it was too long.)"
+                        embed_var = discord.Embed(
+                            title="Please use a paste service", color=0x1D83D4)
                         embed_var.description = response
                         await message.channel.send(embed=embed_var)
     timings = bot.get_cog('Timings')
     await timings.analyze_timings(message)
     await bot.process_commands(message)
 
+
 @bot.command()
 async def ping(ctx):
     await ctx.send(f'Kahti bot ping is {round(bot.latency * 1000)}ms')
 
+
 @bot.command()
 async def invite(ctx):
     await ctx.send('Invite me with this link:\nhttps://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=0&scope=bot')
+
 
 @bot.command(name="react", pass_context=True)
 @has_permissions(administrator=True)
