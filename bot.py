@@ -40,6 +40,8 @@ async def on_ready():
     logging.info('Bot ID: {}'.format(bot.user.id))
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
+    if os.path.exists("wiki.py"):
+        await wiki.fetch_definitions()
 
 
 def get_embed(title, description):
@@ -110,8 +112,13 @@ async def process_potential_logs(message, tests, threshold):
         result += test[1] * message.content.count(test[0])
         # Check if passed threshold
         if result >= threshold:
+            # Turn message into a pastebin
             response = await process_text(message.content, message.author.mention)
+
+            # Send the paste to the channel
             await message.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
+
+            # Remove original message
             # TODO: Proper message removal function here
 
 
