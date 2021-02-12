@@ -9,6 +9,7 @@ from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
 import aiohttp
 from unidecode import unidecode
+from difflib import get_close_matches
 
 # Imports wiki only if library exists
 try:
@@ -50,17 +51,30 @@ def get_embed(title, description):
 @bot.event
 async def on_message(message):
     # Prevent responding to bot messages
-    if message.author == bot.user:
-        return
+    if message.author == bot.user: return
 
     # Process pastes
     invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg')
-    await process_potential_paste(message, invalid_extensions)
+    if await process_potential_paste(message, invalid_extensions): return
 
     # Process pasted logs
     tests = [('[', 5), (']', 5), (':', 3), ('\\', 5), ('ERROR', 20), ('INFO', 20), ('WARN', 20), ('ERROR]:', 20), ('INFO]:', 30), ('WARN]:', 20)]
     threshold = 50
-    await process_potential_logs(message, tests, threshold)
+    if await process_potential_logs(message, tests, threshold): return
+
+    # Check for people asking to ask
+    definitions = [
+        'Can someone please help?',
+        'Hey I have a question',
+        'I have a question, can anyone help?',
+        'Help please',
+        'Please help me',
+        'Help, I need somebody. Help, not just anybody',
+        'Can someone help me with',
+        'Do you know',
+        'Help me please'
+    ]
+    if await ask_to_ask(message, definitions): return
 
     # Process timings
     timings = bot.get_cog('Timings')
@@ -101,6 +115,8 @@ async def process_potential_paste(message, invalid_extensions):
             async with session.get(download, allow_redirects=True) as r:
                 response = await process_text(unidecode(await r.text()), message.author.mention)
                 await message.channel.send(embed=get_embed("Please use a pasting service", response))
+                return True
+    return False
 
 async def process_potential_logs(message, tests, threshold):
     """
@@ -124,12 +140,19 @@ async def process_potential_logs(message, tests, threshold):
 
             # Remove original message & terminate loop
             await message.delete()
-            return
+            return True
         
     # Print a message if half the threshold was reached
     if result > threshold / 2:
         print("Half of log/code catching threshold reached {} of {}".format(result, threshold))
+    return False
 
+async def ask_to_ask(message, definitions):
+    if get_close_matches(message.content, definitions, 1, 0.4):
+        await message.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(message.author.name)))
+        await message.delete()
+        return True
+    return False
 
 @bot.command()
 async def wiki(ctx, *args):
