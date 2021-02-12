@@ -38,10 +38,10 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game('Reading your timing reports'))
     logging.info('Connected to bot: {}'.format(bot.user.name))
     logging.info('Bot ID: {}'.format(bot.user.id))
+    if os.path.exists("wiki.py"):
+        await wikilib.fetch_definitions()
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
-    if os.path.exists("wiki.py"):
-        await wiki.fetch_definitions()
 
 
 def get_embed(title, description):
@@ -49,12 +49,16 @@ def get_embed(title, description):
 
 @bot.event
 async def on_message(message):
+    # Prevent responding to bot messages
+    if message.author == bot.user:
+        return
+
     # Process pastes
     invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg')
     await process_potential_paste(message, invalid_extensions)
 
     # Process pasted logs
-    tests = [('[', 5), (']', 5), (':', 3), ('ERROR', 20), ('INFO', 20), ('WARN', 20), ('ERROR]:', 20), ('INFO]:', 30), ('WARN]:', 20)]
+    tests = [('[', 5), (']', 5), (':', 3), ('\\', 5), ('ERROR', 20), ('INFO', 20), ('WARN', 20), ('ERROR]:', 20), ('INFO]:', 30), ('WARN]:', 20)]
     threshold = 50
     await process_potential_logs(message, tests, threshold)
 
@@ -104,7 +108,7 @@ async def process_potential_logs(message, tests, threshold):
     2. Check if passed threshold
     3. Turn message into a pastebin
     4. Send the paste to the channel
-    5. Remove original message
+    5. Remove original message & terminate loop
     """
     # Check tests and sum results
     result = 0
@@ -118,8 +122,13 @@ async def process_potential_logs(message, tests, threshold):
             # Send the paste to the channel
             await message.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
 
-            # Remove original message
-            # TODO: Proper message removal function here
+            # Remove original message & terminate loop
+            await message.delete()
+            break
+        
+        # Print a message if half the threshold was reached
+        elif result > threshold / 2:
+            print("Half of log/code catching threshold reached {} of {}".format(result, threshold))
 
 
 @bot.command()
