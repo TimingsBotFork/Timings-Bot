@@ -124,11 +124,11 @@ async def process_potential_logs(message, tests, threshold):
 
             # Remove original message & terminate loop
             await message.delete()
-            break
+            return
         
-        # Print a message if half the threshold was reached
-        elif result > threshold / 2:
-            print("Half of log/code catching threshold reached {} of {}".format(result, threshold))
+    # Print a message if half the threshold was reached
+    if result > threshold / 2:
+        print("Half of log/code catching threshold reached {} of {}".format(result, threshold))
 
 
 @bot.command()
