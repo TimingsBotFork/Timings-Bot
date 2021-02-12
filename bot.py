@@ -112,7 +112,7 @@ async def process_potential_logs(message, tests, threshold):
         if result >= threshold:
             response = await process_text(message.content, message.author.mention)
             await message.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
-            await bot.delete_message(message)
+            # TODO: Proper message removal function here
 
 
 @bot.command()
