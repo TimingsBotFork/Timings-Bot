@@ -148,7 +148,7 @@ async def process_potential_logs(message, tests, threshold):
     return False
 
 async def ask_to_ask(message, definitions):
-    if get_close_matches(message.content, definitions, 1, 0.4):
+    if get_close_matches(message.content, definitions, 1, 0.7):
         await message.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(message.author.name)))
         await message.delete()
         return True
