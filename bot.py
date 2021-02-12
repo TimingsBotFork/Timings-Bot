@@ -38,49 +38,97 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game('Reading your timing reports'))
     logging.info('Connected to bot: {}'.format(bot.user.name))
     logging.info('Bot ID: {}'.format(bot.user.id))
+    if os.path.exists("wiki.py"):
+        await wikilib.fetch_definitions()
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
 
 
+def get_embed(title, description):
+    return discord.Embed(title=title, description=description, color=0x1D83D4)
+
 @bot.event
 async def on_message(message):
-    # Binflop
-    if len(message.attachments) > 0 and not message.attachments[0].url.endswith(
-            ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg')):
-        download = message.attachments[0].url
-        async with aiohttp.ClientSession() as session:
-            async with session.get(download, allow_redirects=True) as r:
+    # Prevent responding to bot messages
+    if message.author == bot.user:
+        return
 
-                # . r = requests.get(download, allow_redirects=True)
-                text = await r.text()
-                text = unidecode(text)
-                text = "\n".join(text.splitlines())
-                if '�' not in text:  # If it's not an image/gif
-                    truncated = False
-                    if len(text) > 100000:
-                        text = text[:99999]
-                        truncated = True
-                    req = requests.post(
-                        'https://bin.bloom.host/documents', data=text)
-                    key = json.loads(req.content)['key']
-                    response = "https://bin.bloom.host/" + key
-                    response += "\nRequested by " + message.author.mention
-                    if truncated:
-                        response += "\n(file was truncated because it was too long.)"
-                    embed_var = discord.Embed(
-                        title="Please use a paste service", color=0x1D83D4)
-                    embed_var.description = response
-                    await message.channel.send(embed=embed_var)
+    # Process pastes
+    invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg')
+    await process_potential_paste(message, invalid_extensions)
+
+    # Process pasted logs
+    tests = [('[', 5), (']', 5), (':', 3), ('\\', 5), ('ERROR', 20), ('INFO', 20), ('WARN', 20), ('ERROR]:', 20), ('INFO]:', 30), ('WARN]:', 20)]
+    threshold = 50
+    await process_potential_logs(message, tests, threshold)
+
+    # Process timings
     timings = bot.get_cog('Timings')
     await timings.analyze_timings(message)
+    
+    # Process commands
     await bot.process_commands(message)
-
 
 @bot.command()
 async def ping(ctx):
     await ctx.send(f'Kahti bot ping is {round(bot.latency * 1000)}ms')
 
 # Only used if the wiki library is present in the folder
+
+async def process_text(text, author):
+    # . r = requests.get(download, allow_redirects=True)
+    text = "\n".join(text.splitlines())
+    if '�' not in text:  # If it's not an image/gif
+        truncated = False
+        if len(text) > 100000:
+            text = text[:99999]
+            truncated = True
+        req = requests.post(
+            'https://bin.bloom.host/documents', data=text)
+        key = json.loads(req.content)['key']
+        response = "https://bin.bloom.host/" + key
+        response += "\nRequested by " + author
+        if truncated:
+            response += "\n(file was truncated because it was too long.)"
+        return response
+    else:
+        return "ERROR: Received data is image or gif" + "\nRequested by " + author
+
+async def process_potential_paste(message, invalid_extensions):
+    if len(message.attachments) > 0 and not message.attachments[0].url.endswith(invalid_extensions):
+        download = message.attachments[0].url
+        async with aiohttp.ClientSession() as session:
+            async with session.get(download, allow_redirects=True) as r:
+                response = await process_text(unidecode(await r.text()), message.author.mention)
+                await message.channel.send(embed=get_embed("Please use a pasting service", response))
+
+async def process_potential_logs(message, tests, threshold):
+    """
+    1. Check tests and sum results
+    2. Check if passed threshold
+    3. Turn message into a pastebin
+    4. Send the paste to the channel
+    5. Remove original message & terminate loop
+    """
+    # Check tests and sum results
+    result = 0
+    for test in tests:
+        result += test[1] * message.content.count(test[0])
+        # Check if passed threshold
+        if result >= threshold:
+            # Turn message into a pastebin
+            response = await process_text(message.content, message.author.mention)
+
+            # Send the paste to the channel
+            await message.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
+
+            # Remove original message & terminate loop
+            await message.delete()
+            break
+        
+        # Print a message if half the threshold was reached
+        elif result > threshold / 2:
+            print("Half of log/code catching threshold reached {} of {}".format(result, threshold))
 
 
 @bot.command()
