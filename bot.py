@@ -7,16 +7,37 @@ import sys
 from discord.ext import commands, tasks
 from discord.ext.commands import has_permissions, MissingPermissions
 from dotenv import load_dotenv
-import aiohttp
-from unidecode import unidecode
 from difflib import get_close_matches
-
 # Imports wiki only if library exists
 try:
     if os.path.exists("wiki.py"):
         import wiki as wikilib
 except ImportError:
     print("Wiki module import not functioning (wiki.py). Is the file corrupt?")
+
+# Get ask-to-ask definitions
+a2a_definitions = []
+if not os.path.exists('ask-to-ask.json'):
+    print("Could not find ask-to-ask definitions json. Please download from GitHub.")
+else:
+    with open('ask-to-ask.json', 'r') as defs:
+        a2a_definitions = json.load(defs)["definitions"]
+# print("Ask to ask definitions:\n - " + '\n - '.join(a2a_definitions["definitions"]))
+
+
+# Get pasted log definitions
+pl_definitions = []
+pl_threshold = 0
+if not os.path.exists('pasted-logs.json'):
+    print("Could not find pasted log definitions json. Please download from GitHub.")
+else:
+    with open('pasted-logs.json') as infile:
+        raw_data = json.load(infile)
+        pl_definitions = raw_data["definitions"]
+        pl_threshold = raw_data["threshold"]
+        infile.close()
+# print("Pasted log threshold:" + pl_threshold + ", definitions:\n - " + '\n - '.join(pl_definitions["definitions"]))
+
 
 # Import subprocess
 bot = commands.Bot(command_prefix=".", intents=discord.Intents.default(),
@@ -39,10 +60,10 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game('Reading your timing reports'))
     logging.info('Connected to bot: {}'.format(bot.user.name))
     logging.info('Bot ID: {}'.format(bot.user.id))
-    if os.path.exists("wiki.py"):
-        await wikilib.fetch_definitions()
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
+    global wiki
+    wiki = wikilib.Wiki(0)
 
 
 def get_embed(title, description):
@@ -53,28 +74,18 @@ async def on_message(message):
     # Prevent responding to bot messages
     if message.author == bot.user: return
 
+    # Exit if message starts with "no kahti" or "no kathi"
+    if message.content.startswith("no kahti") or message.content.startswith("no kathi"): return
+
     # Process pastes
     invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg')
     if await process_potential_paste(message, invalid_extensions): return
 
     # Process pasted logs
-    tests = [('[', 5), (']', 5), (':', 3), ('\\', 5), ('ERROR', 20), ('INFO', 20), ('WARN', 20), ('ERROR]:', 20), ('INFO]:', 30), ('WARN]:', 20)]
-    threshold = 50
-    if await process_potential_logs(message, tests, threshold): return
+    if await process_potential_logs(message): return
 
     # Check for people asking to ask
-    definitions = [
-        'Can someone please help?',
-        'Hey I have a question',
-        'I have a question, can anyone help?',
-        'Help please',
-        'Please help me',
-        'Help, I need somebody. Help, not just anybody',
-        'Can someone help me with',
-        'Do you know',
-        'Help me please'
-    ]
-    if await ask_to_ask(message, definitions): return
+    if await ask_to_ask(message): return
 
     # Process timings
     timings = bot.get_cog('Timings')
@@ -97,8 +108,7 @@ async def process_text(text, author):
         if len(text) > 100000:
             text = text[:99999]
             truncated = True
-        req = requests.post(
-            'https://bin.bloom.host/documents', data=text)
+        req = requests.post('https://bin.bloom.host/documents', data=text)
         key = json.loads(req.content)['key']
         response = "https://bin.bloom.host/" + key
         response += "\nRequested by " + author
@@ -110,15 +120,13 @@ async def process_text(text, author):
 
 async def process_potential_paste(message, invalid_extensions):
     if len(message.attachments) > 0 and not message.attachments[0].url.endswith(invalid_extensions):
-        download = message.attachments[0].url
-        async with aiohttp.ClientSession() as session:
-            async with session.get(download, allow_redirects=True) as r:
-                response = await process_text(unidecode(await r.text()), message.author.mention)
-                await message.channel.send(embed=get_embed("Please use a pasting service", response))
-                return True
+        text = await discord.Attachment.read(message.attachments[0], use_cached=False)
+        response = await process_text(text.decode('Latin-1'), message.author.mention)
+        await message.channel.send(embed=get_embed("Please use a pasting service", response))
+        return True
     return False
 
-async def process_potential_logs(message, tests, threshold):
+async def process_potential_logs(message):
     """
     1. Check tests and sum results
     2. Check if passed threshold
@@ -128,10 +136,10 @@ async def process_potential_logs(message, tests, threshold):
     """
     # Check tests and sum results
     result = 0
-    for test in tests:
+    for test in pl_definitions.items():
         result += test[1] * message.content.count(test[0])
         # Check if passed threshold
-        if result >= threshold:
+        if result >= pl_threshold:
             # Turn message into a pastebin
             response = await process_text(message.content, message.author.mention)
 
@@ -143,12 +151,12 @@ async def process_potential_logs(message, tests, threshold):
             return True
         
     # Print a message if half the threshold was reached
-    if result > threshold / 2:
-        print("Half of log/code catching threshold reached {} of {}".format(result, threshold))
+    if result > pl_threshold / 2:
+        print("Half of log/code catching threshold reached {} of {}".format(result, pl_threshold))
     return False
 
-async def ask_to_ask(message, definitions):
-    if get_close_matches(message.content, definitions, 1, 0.7):
+async def ask_to_ask(message):
+    if get_close_matches(message.content, a2a_definitions, 1, 0.7):
         await message.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(message.author.name)))
         await message.delete()
         return True
@@ -157,13 +165,11 @@ async def ask_to_ask(message, definitions):
 @bot.command()
 async def wiki(ctx, *args):
     if os.path.exists("wiki.py"):
-        await wikilib.wiki(ctx, *args)
-
+        await wiki.wiki(ctx, *args)
 
 @bot.command()
 async def invite(ctx):
     await ctx.send('Invite me with this link:\nhttps://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=0&scope=bot')
-
 
 @bot.command(name="react", pass_context=True)
 @has_permissions(administrator=True)

@@ -1,5 +1,6 @@
 # Wiki & test files
 wiki.py
+wiki-definitions.json
 test.py
 
 # Byte-compiled / optimized / DLL files
