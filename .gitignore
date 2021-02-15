@@ -3,6 +3,9 @@ wiki.py
 wiki-definitions.json
 test.py
 
+# Backups
+*.zip
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
