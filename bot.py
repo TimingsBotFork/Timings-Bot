@@ -62,8 +62,8 @@ async def on_ready():
     logging.info('Bot ID: {}'.format(bot.user.id))
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
-    global wiki
-    wiki = wikilib.Wiki(0)
+    global Wiki
+    Wiki = wikilib.Wiki(0)
 
 
 def get_embed(title, description):
@@ -146,8 +146,7 @@ async def process_potential_logs(message):
             # Send the paste to the channel
             await message.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
 
-            # Remove original message & terminate loop
-            await message.delete()
+            # Terminate loop
             return True
         
     # Print a message if half the threshold was reached
@@ -156,7 +155,7 @@ async def process_potential_logs(message):
     return False
 
 async def ask_to_ask(message):
-    if get_close_matches(message.content, a2a_definitions, 1, 0.7):
+    if get_close_matches(message.content, a2a_definitions, 1, 0.8):
         await message.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(message.author.name)))
         await message.delete()
         return True
@@ -165,7 +164,7 @@ async def ask_to_ask(message):
 @bot.command()
 async def wiki(ctx, *args):
     if os.path.exists("wiki.py"):
-        await wiki.wiki(ctx, *args)
+        await Wiki.wiki(ctx, *args)
 
 @bot.command()
 async def invite(ctx):
