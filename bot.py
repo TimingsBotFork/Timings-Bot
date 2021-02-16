@@ -128,7 +128,7 @@ async def on_message(message):
     if message.content.startswith("no kahti") or message.content.startswith("no kathi"): return
 
     # Process pastes
-    invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg')
+    invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg', '.mp3')
     if await process_potential_paste(message, invalid_extensions): return
 
     # Process pasted logs
