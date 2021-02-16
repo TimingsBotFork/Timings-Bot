@@ -163,9 +163,8 @@ async def on_message(ctx):
 async def ping(ctx):
     await ctx.send(f'Kahti bot ping is {round(bot.latency * 1000)}ms')
 
+
 # Only used if the wiki library is present in the folder
-
-
 @bot.command()
 async def wiki(ctx, *args):
     if os.path.exists("wiki.py"):
@@ -173,16 +172,26 @@ async def wiki(ctx, *args):
 
 
 @bot.command()
+async def reload_modules(ctx, *args):
+    """ Reloads all modules specified in `args` """
+    res = []
+    for module in args:
+        if module.endswith(".py"):
+            module = module.replace(".py", "")
+        try: 
+            exec('global {}lib'.format(module))
+            exec('import {} as {}lib'.format(module, module))
+            await ctx.send(embed = get_embed("Reloaded " + module, "Successfully reloaded the {} module".format(module)))
+            res.append(module)
+        except Exception:
+            await ctx.send(embed = get_embed("Error while importing " + module, "Did you place the module in the folder?"))
+    print("Reloaded modules (" + ", ".join(res) + ")")
+
+@bot.command()
 async def reloadw(ctx):
-    if os.path.exists('wiki.py'):
-        global wikilib
-        import wiki as wikilib
-        global Wiki
-        Wiki = wikilib.Wiki(0)
-        await ctx.send(embed = get_embed("Reloaded wiki", "Successfully reloaded the wiki module"))
-    else:
-        await ctx.send(embed = get_embed("Could not find wiki", "Did not reload the wiki module because it does not exist (?)"))
-        
+    await reload_modules(ctx, "wiki.py")
+    global Wiki
+    Wiki = wikilib.Wiki(0)
 
 @bot.command()
 async def invite(ctx):
