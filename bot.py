@@ -64,8 +64,8 @@ def process_text(text, author):
         return "ERROR: Received data is image or gif" + "\nRequested by " + author
 
 
-async def process_potential_paste(message, invalid_extensions):
-    if len(message.attachments) > 0 and not message.attachments[0].url.endswith(invalid_extensions):
+async def process_potential_paste(message, whitelist):
+    if len(message.attachments) > 0 and message.attachments[0].url.endswith(whitelist):
         text = await discord.Attachment.read(message.attachments[0], use_cached=False)
         response = process_text(text.decode('Latin-1'), message.author.mention)
         await message.channel.send(embed=get_embed("Please use a pasting service", response))
@@ -139,7 +139,8 @@ async def on_message(message):
     invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4',
                           '.mov', '.avi', '.gif', '.image', 
                           '.svg', '.mp3', '.jar', '.class')
-    if await process_potential_paste(message, invalid_extensions):
+    whitelist = ('.log', '.txt', '.md', '.java', '.py', '.cpp', '.cs')
+    if await process_potential_paste(message, whitelist):
         return
 
     # Process pasted logs
