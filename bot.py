@@ -173,6 +173,18 @@ async def wiki(ctx, *args):
 
 
 @bot.command()
+async def reloadw(ctx):
+    if os.path.exists('wiki.py'):
+        global wikilib
+        import wiki as wikilib
+        global Wiki
+        Wiki = wikilib.Wiki(0)
+        await ctx.send(embed = get_embed("Reloaded wiki", "Successfully reloaded the wiki module"))
+    else:
+        await ctx.send(embed = get_embed("Could not find wiki", "Did not reload the wiki module because it does not exist (?)"))
+        
+
+@bot.command()
 async def invite(ctx):
     await ctx.send('Invite me with this link:\nhttps://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=0&scope=bot')
 
@@ -186,8 +198,8 @@ async def packs(ctx):
 @has_permissions(administrator=True)
 async def react(ctx, url, reaction):
     channel = await bot.fetch_channel(int(url.split("/")[5]))
-    ctx = await channel.fetch_message(int(url.split("/")[6]))
-    await ctx.add_reaction(reaction)
+    message = await channel.fetch_message(int(url.split("/")[6]))
+    await message.add_reaction(reaction)
     logging.info('reacted to ' + url + ' with ' + reaction)
 
 
