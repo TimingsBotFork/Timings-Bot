@@ -349,8 +349,14 @@ config:
     hopper.disable-move-event:
     - expressions:
       - paper["world-settings"]["default"]["hopper"]["disable-move-event"] == "false"
+      - '"ChestProtect" not in plugins'
+      - '"Lockette" not in plugins'
+      - '"BlockLocker" not in plugins'
+      - '"LockettePro" not in plugins'
+      - '"ChestProtect" not in plugins'
+      - '"LWC" not in plugins'
       prefix: "❌"
-      value: "Enable this in [paper.yml](http://bit.ly/paperconf)"
+      value: "Enable this in [paper.yml](http://bit.ly/paperconf)\nIf you are using a chest protection plugin enabling this can allow players to steal from your chests with hoppers."
     non-player-arrow-despawn-rate:
     - expressions:
       - int(paper["world-settings"]["default"]["non-player-arrow-despawn-rate"]) == -1
