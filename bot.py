@@ -20,14 +20,14 @@ except ImportError:
 
 """ DEFINE BOT """
 bot = commands.Bot(
-    command_prefix=".", 
+    command_prefix=".",
     intents=discord.Intents.default(),
     case_insensitive=True
 )
 
 
-
 """ UTILITY FUNCTIONS """
+
 
 def retrieve_definitions(path):
     """ Retrieves definitions from a json at path `path` - str """
@@ -39,9 +39,11 @@ def retrieve_definitions(path):
             file.close()
             return r
 
+
 def get_embed(title, description):
     """ Returns an embed with `title` -str title and `descrption` -str body. """
     return discord.Embed(title=title, description=description, color=0x1D83D4)
+
 
 def process_text(text, author):
     # . r = requests.get(download, allow_redirects=True)
@@ -61,6 +63,7 @@ def process_text(text, author):
     else:
         return "ERROR: Received data is image or gif" + "\nRequested by " + author
 
+
 async def process_potential_paste(message, invalid_extensions):
     if len(message.attachments) > 0 and not message.attachments[0].url.endswith(invalid_extensions):
         text = await discord.Attachment.read(message.attachments[0], use_cached=False)
@@ -68,6 +71,7 @@ async def process_potential_paste(message, invalid_extensions):
         await message.channel.send(embed=get_embed("Please use a pasting service", response))
         return True
     return False
+
 
 async def process_potential_logs(message):
     """
@@ -91,11 +95,12 @@ async def process_potential_logs(message):
 
             # Terminate loop
             return True
-        
+
     # Print a message if half the threshold was reached
     if result > pl_threshold / 2:
         print("Half of log/code catching threshold reached {} of {}".format(result, pl_threshold))
     return False
+
 
 async def ask_to_ask(message):
     if get_close_matches(message.content, a2a_definitions, 1, 0.8):
@@ -105,8 +110,8 @@ async def ask_to_ask(message):
     return False
 
 
-
 """ BOT EVENTS AND COMMANDS """
+
 
 @bot.event
 async def on_ready():
@@ -119,48 +124,61 @@ async def on_ready():
     global Wiki
     Wiki = wikilib.Wiki(0)
 
+
 @bot.event
 async def on_message(message):
     # Prevent responding to bot messages
-    if message.author == bot.user: return
+    if message.author == bot.user:
+        return
 
     # Exit if message starts with "no kahti" or "no kathi"
-    if message.content.startswith("no kahti") or message.content.startswith("no kathi"): return
+    if message.content.startswith("no kahti") or message.content.startswith("no kathi"):
+        return
 
     # Process pastes
-    invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4', '.mov', '.avi', '.gif', '.image', '.svg', '.mp3')
-    if await process_potential_paste(message, invalid_extensions): return
+    invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4',
+                          '.mov', '.avi', '.gif', '.image', '.svg', '.mp3')
+    if await process_potential_paste(message, invalid_extensions):
+        return
 
     # Process pasted logs
-    if await process_potential_logs(message): return
+    if await process_potential_logs(message):
+        return
 
     # Check for people asking to ask
-    if await ask_to_ask(message): return
+    if await ask_to_ask(message):
+        return
 
     # Process timings
     timings = bot.get_cog('Timings')
     await timings.analyze_timings(message)
-    
+
     # Process commands
     await bot.process_commands(message)
+
 
 @bot.command()
 async def ping(ctx):
     await ctx.send(f'Kahti bot ping is {round(bot.latency * 1000)}ms')
 
 # Only used if the wiki library is present in the folder
+
+
 @bot.command()
 async def wiki(ctx, *args):
     if os.path.exists("wiki.py"):
         await Wiki.wiki(ctx, *args)
 
+
 @bot.command()
 async def invite(ctx):
     await ctx.send('Invite me with this link:\nhttps://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=0&scope=bot')
 
+
 @bot.command()
 async def packs(ctx):
-    await ctx.send(embed=get_embed ("Public Packs", 'https://github.com/IrisDimensions/overworld\nhttps://github.com/Astrashh/Continents (WIP)'))
+    await ctx.send(embed=get_embed("Public Packs", '[Overworld](https://github.com/IrisDimensions/overworld)\n[Continents](https://github.com/Astrashh/Continents) (WIP)'))
+
 
 @bot.command(name="react", pass_context=True)
 @has_permissions(administrator=True)
@@ -169,7 +187,6 @@ async def react(ctx, url, reaction):
     message = await channel.fetch_message(int(url.split("/")[6]))
     await message.add_reaction(reaction)
     logging.info('reacted to ' + url + ' with ' + reaction)
-
 
 
 """ SETUP """
