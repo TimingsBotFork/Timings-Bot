@@ -1,3 +1,5 @@
+""" IMPORTS """
+
 import os
 import discord
 import requests
@@ -15,44 +17,96 @@ try:
 except ImportError:
     print("Wiki module import not functioning (wiki.py). Is the file corrupt?")
 
-# Get ask-to-ask definitions
-a2a_definitions = []
-if not os.path.exists('ask-to-ask.json'):
-    print("Could not find ask-to-ask definitions json. Please download from GitHub.")
-else:
-    with open('ask-to-ask.json', 'r') as defs:
-        a2a_definitions = json.load(defs)["definitions"]
-# print("Ask to ask definitions:\n - " + '\n - '.join(a2a_definitions["definitions"]))
+
+""" DEFINE BOT """
+bot = commands.Bot(
+    command_prefix=".", 
+    intents=discord.Intents.default(),
+    case_insensitive=True
+)
 
 
-# Get pasted log definitions
-pl_definitions = []
-pl_threshold = 0
-if not os.path.exists('pasted-logs.json'):
-    print("Could not find pasted log definitions json. Please download from GitHub.")
-else:
-    with open('pasted-logs.json') as infile:
-        raw_data = json.load(infile)
-        pl_definitions = raw_data["definitions"]
-        pl_threshold = raw_data["threshold"]
-        infile.close()
-# print("Pasted log threshold:" + pl_threshold + ", definitions:\n - " + '\n - '.join(pl_definitions["definitions"]))
+
+""" UTILITY FUNCTIONS """
+
+def retrieve_definitions(path):
+    """ Retrieves definitions from a json at path `path` - str """
+    if not os.path.exists(path):
+        print("Could not find {}. Please make sure the file is there.".format(path))
+    else:
+        with open(path) as file:
+            r = json.load(file)
+            file.close()
+            return r
+
+def get_embed(title, description):
+    """ Returns an embed with `title` -str title and `descrption` -str body. """
+    return discord.Embed(title=title, description=description, color=0x1D83D4)
+
+def process_text(text, author):
+    # . r = requests.get(download, allow_redirects=True)
+    text = "\n".join(text.splitlines())
+    if '�' not in text:  # If it's not an image/gif
+        truncated = False
+        if len(text) > 100000:
+            text = text[:99999]
+            truncated = True
+        req = requests.post('https://bin.bloom.host/documents', data=text)
+        key = json.loads(req.content)['key']
+        response = "https://bin.bloom.host/" + key
+        response += "\nRequested by " + author
+        if truncated:
+            response += "\n(file was truncated because it was too long.)"
+        return response
+    else:
+        return "ERROR: Received data is image or gif" + "\nRequested by " + author
+
+async def process_potential_paste(message, invalid_extensions):
+    if len(message.attachments) > 0 and not message.attachments[0].url.endswith(invalid_extensions):
+        text = await discord.Attachment.read(message.attachments[0], use_cached=False)
+        response = process_text(text.decode('Latin-1'), message.author.mention)
+        await message.channel.send(embed=get_embed("Please use a pasting service", response))
+        return True
+    return False
+
+async def process_potential_logs(message):
+    """
+    1. Check tests and sum results
+    2. Check if passed threshold
+    3. Turn message into a pastebin
+    4. Send the paste to the channel
+    5. Remove original message & terminate loop
+    """
+    # Check tests and sum results
+    result = 0
+    for test in pl_definitions.items():
+        result += test[1] * message.content.count(test[0])
+        # Check if passed threshold
+        if result >= pl_threshold:
+            # Turn message into a pastebin
+            response = process_text(message.content, message.author.mention)
+
+            # Send the paste to the channel
+            await message.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
+
+            # Terminate loop
+            return True
+        
+    # Print a message if half the threshold was reached
+    if result > pl_threshold / 2:
+        print("Half of log/code catching threshold reached {} of {}".format(result, pl_threshold))
+    return False
+
+async def ask_to_ask(message):
+    if get_close_matches(message.content, a2a_definitions, 1, 0.8):
+        await message.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(message.author.name)))
+        await message.delete()
+        return True
+    return False
 
 
-# Import subprocess
-bot = commands.Bot(command_prefix=".", intents=discord.Intents.default(),
-                   case_insensitive=True)
 
-load_dotenv()
-token = os.getenv('token')
-
-logging.basicConfig(filename='console.log',
-                    level=logging.INFO,
-                    format='[%(asctime)s %(levelname)s] %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S',
-                    )
-logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
-
+""" BOT EVENTS AND COMMANDS """
 
 @bot.event
 async def on_ready():
@@ -64,10 +118,6 @@ async def on_ready():
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
     global Wiki
     Wiki = wikilib.Wiki(0)
-
-
-def get_embed(title, description):
-    return discord.Embed(title=title, description=description, color=0x1D83D4)
 
 @bot.event
 async def on_message(message):
@@ -99,68 +149,6 @@ async def ping(ctx):
     await ctx.send(f'Kahti bot ping is {round(bot.latency * 1000)}ms')
 
 # Only used if the wiki library is present in the folder
-
-async def process_text(text, author):
-    # . r = requests.get(download, allow_redirects=True)
-    text = "\n".join(text.splitlines())
-    if '�' not in text:  # If it's not an image/gif
-        truncated = False
-        if len(text) > 100000:
-            text = text[:99999]
-            truncated = True
-        req = requests.post('https://bin.bloom.host/documents', data=text)
-        key = json.loads(req.content)['key']
-        response = "https://bin.bloom.host/" + key
-        response += "\nRequested by " + author
-        if truncated:
-            response += "\n(file was truncated because it was too long.)"
-        return response
-    else:
-        return "ERROR: Received data is image or gif" + "\nRequested by " + author
-
-async def process_potential_paste(message, invalid_extensions):
-    if len(message.attachments) > 0 and not message.attachments[0].url.endswith(invalid_extensions):
-        text = await discord.Attachment.read(message.attachments[0], use_cached=False)
-        response = await process_text(text.decode('Latin-1'), message.author.mention)
-        await message.channel.send(embed=get_embed("Please use a pasting service", response))
-        return True
-    return False
-
-async def process_potential_logs(message):
-    """
-    1. Check tests and sum results
-    2. Check if passed threshold
-    3. Turn message into a pastebin
-    4. Send the paste to the channel
-    5. Remove original message & terminate loop
-    """
-    # Check tests and sum results
-    result = 0
-    for test in pl_definitions.items():
-        result += test[1] * message.content.count(test[0])
-        # Check if passed threshold
-        if result >= pl_threshold:
-            # Turn message into a pastebin
-            response = await process_text(message.content, message.author.mention)
-
-            # Send the paste to the channel
-            await message.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
-
-            # Terminate loop
-            return True
-        
-    # Print a message if half the threshold was reached
-    if result > pl_threshold / 2:
-        print("Half of log/code catching threshold reached {} of {}".format(result, pl_threshold))
-    return False
-
-async def ask_to_ask(message):
-    if get_close_matches(message.content, a2a_definitions, 1, 0.8):
-        await message.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(message.author.name)))
-        await message.delete()
-        return True
-    return False
-
 @bot.command()
 async def wiki(ctx, *args):
     if os.path.exists("wiki.py"):
@@ -182,10 +170,32 @@ async def react(ctx, url, reaction):
     await message.add_reaction(reaction)
     logging.info('reacted to ' + url + ' with ' + reaction)
 
+
+
+""" SETUP """
+
+# Get ask-to-ask and pasted log/code definitions
+a2a_definitions = retrieve_definitions('ask-to-ask.json')["definitions"]
+pl_definitions = retrieve_definitions('ask-to-ask.json')["definitions"]
+pl_threshold = retrieve_definitions('ask-to-ask.json')["threshold"]
+
+# Configure logger
+logging.basicConfig(
+    filename='console.log',
+    level=logging.INFO,
+    format='[%(asctime)s %(levelname)s] %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
+logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
+
+# Load token and run bot
+load_dotenv()
+token = os.getenv('token')
+bot.run(token)
+
+# Load cogs
 for file_name in os.listdir('./cogs'):
     if file_name.endswith('.py'):
         bot.load_extension(f'cogs.{file_name[:-3]}')
-
-bot.run(token)
 
 # full name: message.author.name + "#" + str(message.author.discriminator) + " (" + str(message.author.id) + ")"
