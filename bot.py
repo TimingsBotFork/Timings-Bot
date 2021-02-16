@@ -205,14 +205,14 @@ logging.basicConfig(
 )
 logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
-# Load token and run bot
-load_dotenv()
-token = os.getenv('token')
-bot.run(token)
-
 # Load cogs
 for file_name in os.listdir('./cogs'):
     if file_name.endswith('.py'):
         bot.load_extension(f'cogs.{file_name[:-3]}')
+        
+# Load token and run bot
+load_dotenv()
+token = os.getenv('token')
+bot.run(token)
 
 # full name: message.author.name + "#" + str(message.author.discriminator) + " (" + str(message.author.id) + ")"
