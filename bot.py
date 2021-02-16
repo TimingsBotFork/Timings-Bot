@@ -64,16 +64,16 @@ def process_text(text, author):
         return "ERROR: Received data is image or gif" + "\nRequested by " + author
 
 
-async def process_potential_paste(message, whitelist):
-    if len(message.attachments) > 0 and message.attachments[0].url.endswith(whitelist):
-        text = await discord.Attachment.read(message.attachments[0], use_cached=False)
-        response = process_text(text.decode('Latin-1'), message.author.mention)
-        await message.channel.send(embed=get_embed("Please use a pasting service", response))
+async def process_potential_paste(ctx, whitelist):
+    if len(ctx.attachments) > 0 and ctx.attachments[0].url.endswith(whitelist):
+        text = await discord.Attachment.read(ctx.attachments[0], use_cached=False)
+        response = process_text(text.decode('Latin-1'), ctx.author.mention)
+        await ctx.channel.send(embed=get_embed("Please use a pasting service", response))
         return True
     return False
 
 
-async def process_potential_logs(message):
+async def process_potential_logs(ctx):
     """
     1. Check tests and sum results
     2. Check if passed threshold
@@ -84,14 +84,14 @@ async def process_potential_logs(message):
     # Check tests and sum results
     result = 0
     for test in pl_definitions.items():
-        result += test[1] * message.content.count(test[0])
+        result += test[1] * ctx.content.count(test[0])
         # Check if passed threshold
         if result >= pl_threshold:
             # Turn message into a pastebin
-            response = process_text(message.content, message.author.mention)
+            response = process_text(ctx.content, ctx.author.mention)
 
             # Send the paste to the channel
-            await message.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
+            await ctx.channel.send(embed=get_embed("Here is your pasted code / log file:", response))
 
             # Terminate loop
             return True
@@ -102,10 +102,10 @@ async def process_potential_logs(message):
     return False
 
 
-async def ask_to_ask(message):
-    if get_close_matches(message.content, a2a_definitions, 1, 0.8):
-        await message.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(message.author.name)))
-        await message.delete()
+async def ask_to_ask(ctx):
+    if get_close_matches(ctx.content, a2a_definitions, 1, 0.8):
+        await ctx.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(ctx.author.name)))
+        await ctx.delete()
         return True
     return False
 
@@ -126,13 +126,13 @@ async def on_ready():
 
 
 @bot.event
-async def on_message(message):
+async def on_message(ctx):
     # Prevent responding to bot messages
-    if message.author == bot.user:
+    if ctx.author == bot.user:
         return
 
     # Exit if message starts with "no kahti" or "no kathi"
-    if message.content.startswith("no kahti") or message.content.startswith("no kathi"):
+    if ctx.content.startswith("no kahti") or ctx.content.startswith("no kathi"):
         return
 
     # Process pastes
@@ -140,23 +140,23 @@ async def on_message(message):
                           '.mov', '.avi', '.gif', '.image', 
                           '.svg', '.mp3', '.jar', '.class')
     whitelist = ('.log', '.txt', '.md', '.java', '.py', '.cpp', '.cs')
-    if await process_potential_paste(message, whitelist):
+    if await process_potential_paste(ctx, whitelist):
         return
 
     # Process pasted logs
-    if await process_potential_logs(message):
+    if await process_potential_logs(ctx):
         return
 
     # Check for people asking to ask
-    if await ask_to_ask(message):
+    if await ask_to_ask(ctx):
         return
 
     # Process timings
     timings = bot.get_cog('Timings')
-    await timings.analyze_timings(message)
+    await timings.analyze_timings(ctx)
 
     # Process commands
-    await bot.process_commands(message)
+    await bot.process_commands(ctx)
 
 
 @bot.command()
@@ -186,8 +186,8 @@ async def packs(ctx):
 @has_permissions(administrator=True)
 async def react(ctx, url, reaction):
     channel = await bot.fetch_channel(int(url.split("/")[5]))
-    message = await channel.fetch_message(int(url.split("/")[6]))
-    await message.add_reaction(reaction)
+    ctx = await channel.fetch_message(int(url.split("/")[6]))
+    await ctx.add_reaction(reaction)
     logging.info('reacted to ' + url + ' with ' + reaction)
 
 
