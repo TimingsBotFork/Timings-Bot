@@ -137,7 +137,8 @@ async def on_message(message):
 
     # Process pastes
     invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4',
-                          '.mov', '.avi', '.gif', '.image', '.svg', '.mp3')
+                          '.mov', '.avi', '.gif', '.image', 
+                          '.svg', '.mp3', '.jar', '.class')
     if await process_potential_paste(message, invalid_extensions):
         return
 
