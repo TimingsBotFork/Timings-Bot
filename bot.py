@@ -172,7 +172,7 @@ async def invite(ctx):
 
 @bot.command()
 async def packs(ctx):
-    await ctx.send('Current public packs:\nhttps://github.com/IrisDimensions/overworld\nhttps://github.com/Astrashh/Continents (WIP)')
+    await ctx.send(embed=get_embed ("Public Packs", 'https://github.com/IrisDimensions/overworld\nhttps://github.com/Astrashh/Continents (WIP)'))
 
 @bot.command(name="react", pass_context=True)
 @has_permissions(administrator=True)
