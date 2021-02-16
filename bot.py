@@ -170,6 +170,10 @@ async def wiki(ctx, *args):
 async def invite(ctx):
     await ctx.send('Invite me with this link:\nhttps://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=0&scope=bot')
 
+@bot.command()
+async def packs(ctx):
+    await ctx.send('Current public packs:\nhttps://github.com/IrisDimensions/overworld\nhttps://github.com/Astrashh/Continents (WIP)')
+
 @bot.command(name="react", pass_context=True)
 @has_permissions(administrator=True)
 async def react(ctx, url, reaction):
