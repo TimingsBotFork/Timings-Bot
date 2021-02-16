@@ -176,8 +176,8 @@ async def react(ctx, url, reaction):
 
 # Get ask-to-ask and pasted log/code definitions
 a2a_definitions = retrieve_definitions('ask-to-ask.json')["definitions"]
-pl_definitions = retrieve_definitions('ask-to-ask.json')["definitions"]
-pl_threshold = retrieve_definitions('ask-to-ask.json')["threshold"]
+pl_definitions = retrieve_definitions('pasted-logs.json')["definitions"]
+pl_threshold = retrieve_definitions('pasted-logs.json')["threshold"]
 
 # Configure logger
 logging.basicConfig(
