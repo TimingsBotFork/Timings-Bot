@@ -46,12 +46,11 @@ plugins:
     LimitPillagers:
       prefix: "❌"
       value: |-
-        You probably don't need LimitPillagers as Paper already adds its features. 
+        LimitPillagers is not useful in 1.15 and above.
     VillagerOptimiser:
       prefix: "❌"
       value: |-
-        You probably don't need VillagerOptimiser as Paper already adds its features. 
-        See entity-activation-range in spigot.yml.
+        VillagerOptimiser is not useful in 1.15 and above.
     StackMob:
       prefix: "❌"
       value: |-

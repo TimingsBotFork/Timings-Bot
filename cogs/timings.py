@@ -28,8 +28,7 @@ class Timings(commands.Cog):
         words = message.content.replace("\n", " ").split(" ")
         timings_url = ""
         embed_var = discord.Embed(title=self.TIMINGS_TITLE)
-        embed_var.set_footer(
-            text=f"Please note that these options are generally going for the minimum. Adjust them to match your server. Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
+        embed_var.set_footer(text=f"Please note that these options are generally going for the minimum. Adjust them to match your server. Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
 
         for word in words:
             if word.startswith("https://timin") and "/d=" in word:
@@ -52,7 +51,7 @@ class Timings(commands.Cog):
             timings_url = timings_url.split("#")[0]
         if "?id=" not in timings_url:
             return
-        logging.info(timings_url)
+        logging.info(f'Timings analyzed from {message.author} ({message.author.id}): {timings_url}')
 
         timings_host, timings_id = timings_url.split("?id=")
         timings_json = timings_host + "data.php?id=" + timings_id
@@ -77,8 +76,7 @@ class Timings(commands.Cog):
                     version_result = version_result.group() if version_result else None
                     if version_result:
                         if compare_versions(version_result, TIMINGS_CHECK["version"]) == -1:
-                            version = version.replace(
-                                "git-", "").replace("MC: ", "")
+                            version = version.replace("git-", "").replace("MC: ", "")
                             embed_var.add_field(name="❌ Outdated",
                                                 value=f'You are using `{version}`. Update to `{TIMINGS_CHECK["version"]}`.')
                     else:
@@ -93,8 +91,7 @@ class Timings(commands.Cog):
                 logging.info("Missing: " + str(key))
 
             try:
-                timing_cost = int(
-                    request["timingsMaster"]["system"]["timingcost"])
+                timing_cost = int(request["timingsMaster"]["system"]["timingcost"])
                 if timing_cost > 300:
                     embed_var.add_field(name="❌ Timingcost",
                                         value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. Find a better host.")
@@ -162,8 +159,7 @@ class Timings(commands.Cog):
                             player_ticks = request["timingsMaster"]["data"][index]["minuteReports"][0]["ticks"][
                                 "playerTicks"]
                             players = (player_ticks / timed_ticks)
-                            max_online_players = max(
-                                players, max_online_players)
+                            max_online_players = max(players, max_online_players)
                             index = index + 1
                         if 1000 * max_online_players / int(max_mem) > 6 and int(max_mem) < 10000:
                             embed_var.add_field(name="❌ Low memory",
@@ -180,7 +176,7 @@ class Timings(commands.Cog):
                                     min_mem = min_mem.replace("m", "")
                             if min_mem != max_mem:
                                 embed_var.add_field(name="❌ Aikar's Flags",
-                                                    value="Your Xmx and Xms values should be equivalent when using Aikar's flags.")
+                                                    value="Your Xmx and Xms values should be equal when using Aikar's flags.")
                 elif "-Dusing.aikars.flags=mcflags.emc.gs" in flags:
                     embed_var.add_field(name="❌ Outdated Flags",
                                         value="Update [Aikar's flags](https://aikar.co/2018/07/02/tuning-the-jvm-g1gc-garbage-collector-flags-for-minecraft/).")
@@ -206,16 +202,14 @@ class Timings(commands.Cog):
                 for handler in handlers:
                     handler_name = request_raw["idmap"]["handlers"][handler][1]
                     if handler_name.startswith("Command Function - ") and handler_name.endswith(":tick"):
-                        handler_name = handler_name.split(
-                            "Command Function - ")[1].split(":tick")[0]
+                        handler_name = handler_name.split("Command Function - ")[1].split(":tick")[0]
                         embed_var.add_field(name=f"❌ {handler_name}",
                                             value=f"This datapack uses command functions which are laggy.")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
             plugins = request["timingsMaster"]["plugins"] if "plugins" in request["timingsMaster"] else None
-            server_properties = request["timingsMaster"]["config"][
-                "server.properties"] if "server.properties" in request["timingsMaster"]["config"] else None
+            server_properties = request["timingsMaster"]["config"]["server.properties"] if "server.properties" in request["timingsMaster"]["config"] else None
             bukkit = request["timingsMaster"]["config"]["bukkit"] if "bukkit" in request["timingsMaster"]["config"] else None
             spigot = request["timingsMaster"]["config"]["spigot"] if "spigot" in request["timingsMaster"]["config"] else None
             paper = request["timingsMaster"]["config"]["paper"] if "paper" in request["timingsMaster"]["config"] else None
@@ -231,8 +225,7 @@ class Timings(commands.Cog):
                                         stored_plugin = TIMINGS_CHECK["plugins"][server_name][plugin_name]
                                         if isinstance(stored_plugin, dict):
                                             stored_plugin["name"] = plugin_name
-                                            embed_var.add_field(
-                                                **create_field(stored_plugin))
+                                            embed_var.add_field(**create_field(stored_plugin))
                                         else:
                                             eval_field(embed_var, stored_plugin, plugin_name, plugins,
                                                        server_properties, bukkit, spigot, paper, tuinity, purpur)
@@ -253,14 +246,14 @@ class Timings(commands.Cog):
                     if authors is not None and "songoda" in request["timingsMaster"]["plugins"][plugin]["authors"].casefold():
                         if plugin == "EpicHeads":
                             embed_var.add_field(name="❌ EpicHeads",
-                                                value="This plugin was made by Songoda. Songoda resources are poorly developed and often cause problems. You should find an alternative such as [HeadsPlus](https://spigotmc.org/resources/headsplus-»-1-8-1-16-4.40265/) or [HeadDatabase](https://www.spigotmc.org/resources/head-database.14280/).")
+                                                value="This plugin was made by Songoda. Songoda is sketchy. You should find an alternative such as [HeadsPlus](https://spigotmc.org/resources/headsplus-»-1-8-1-16-4.40265/) or [HeadDatabase](https://www.spigotmc.org/resources/head-database.14280/).")
                         elif plugin == "UltimateStacker":
                             embed_var.add_field(name="❌ UltimateStacker",
                                                 value="Stacking plugins actually causes more lag. "
                                                       "Remove UltimateStacker.")
                         else:
                             embed_var.add_field(name="❌ " + plugin,
-                                                value="This plugin was made by Songoda. Songoda resources are poorly developed and often cause problems. You should find an alternative.")
+                                                value="This plugin was made by Songoda. Songoda is sketchy. You should find an alternative.")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
@@ -269,10 +262,8 @@ class Timings(commands.Cog):
                 if not using_tweaks:
                     worlds = request_raw["worlds"]
                     for world in worlds:
-                        tvd = int(request_raw["worlds"]
-                                  [world]["ticking-distance"])
-                        ntvd = int(request_raw["worlds"]
-                                   [world]["notick-viewdistance"])
+                        tvd = int(request_raw["worlds"][world]["ticking-distance"])
+                        ntvd = int(request_raw["worlds"][world]["notick-viewdistance"])
                         if ntvd <= tvd and tvd >= 5:
                             if spigot["world-settings"]["default"]["view-distance"] == "default":
                                 embed_var.add_field(name="❌ no-tick-view-distance",
@@ -290,8 +281,7 @@ class Timings(commands.Cog):
                 worlds = request_raw["worlds"]
                 high_mec = False
                 for world in worlds:
-                    max_entity_cramming = int(
-                        request_raw["worlds"][world]["gamerules"]["maxEntityCramming"])
+                    max_entity_cramming = int(request_raw["worlds"][world]["gamerules"]["maxEntityCramming"])
                     if max_entity_cramming >= 24:
                         high_mec = True
                 if high_mec:
@@ -299,6 +289,7 @@ class Timings(commands.Cog):
                                         value=f"Decrease this by running the /gamerule command in each world. Recommended: 8. ")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
+
 
             try:
                 normal_ticks = request["timingsMaster"]["data"][0]["totalTicks"]
@@ -313,10 +304,10 @@ class Timings(commands.Cog):
                             worst_tps = tps
                 if worst_tps < 10:
                     red = 255
-                    green = int(205 * (0.1 * worst_tps))
+                    green = int(255 * (0.1 * worst_tps))
                 else:
-                    red = int(205 * (-0.1 * worst_tps + 2))
-                    green = 205
+                    red = int(255 * (-0.1 * worst_tps + 2))
+                    green = 255
                 color = int(red*256*256 + green*256)
                 embed_var.color = color
             except KeyError as key:
@@ -329,7 +320,7 @@ class Timings(commands.Cog):
 
         if len(embed_var.fields) == 0:
             embed_var.add_field(name="✅ All good",
-                                value="Analyzed with no issues")
+                                value="Analyzed with no recommendations")
             await message.reply(embed=embed_var)
             return
 
@@ -382,8 +373,7 @@ def eval_field(embed_var, option, option_name, plugins, server_properties, bukki
                 """ f strings don't like newlines so we replace the newlines with placeholder text before we eval """
                 option_data["value"] = eval('f"""' + option_data["value"].replace("\n", "\\|n\\") + '"""').replace(
                     "\\|n\\", "\n")
-                embed_var.add_field(
-                    **create_field({**{"name": option_name}, **option_data}))
+                embed_var.add_field(**create_field({**{"name": option_name}, **option_data}))
                 break
 
     except KeyError as key:
