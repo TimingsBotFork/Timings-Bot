@@ -396,6 +396,7 @@ config:
       - '"PetBlocks" not in plugins'
       - '"BlockBalls" not in plugins'
       - '"ArmorStandTools" not in plugins'
+      - '"VehiclesPlusPro" not in plugins'
       prefix: "❌"
       value: "Disable this in [paper.yml](http://bit.ly/paperconf)."
     per-player-mob-spawns:
