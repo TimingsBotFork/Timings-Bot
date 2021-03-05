@@ -139,7 +139,7 @@ async def on_message(ctx):
     invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4',
                           '.mov', '.avi', '.gif', '.image', 
                           '.svg', '.mp3', '.jar', '.class')
-    whitelist = ('.log', '.txt', '.md', '.java', '.py', '.cpp', '.cs')
+    whitelist = ('.log', '.txt', '.md', '.java', '.py', '.cpp', '.cs', '.yml')
     if await process_potential_paste(ctx, whitelist):
         return
 
