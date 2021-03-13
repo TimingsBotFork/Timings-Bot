@@ -28,7 +28,10 @@ class Timings(commands.Cog):
         words = message.content.replace("\n", " ").split(" ")
         timings_url = ""
         embed_var = discord.Embed(title=self.TIMINGS_TITLE)
-        embed_var.set_footer(text=f"Please note that these options are generally going for the minimum. Adjust them to match your server. Requested by {message.author.name}#{message.author.discriminator}", icon_url=message.author.avatar_url)
+        embed_var.set_footer(text=f"Please note that these options are generally going for the minimum. Adjust them "
+                                  f"to match your server. Requested"
+                                  f" by {message.author.name}#{message.author.discriminator}",
+                             icon_url=message.author.avatar_url)
 
         for word in words:
             if word.startswith("https://timin") and "/d=" in word:
@@ -40,7 +43,8 @@ class Timings(commands.Cog):
             if word.startswith("https://www.spigotmc.org/go/timings?url=") or word.startswith(
                     "https://timings.spigotmc.org/?url="):
                 embed_var.add_field(name="❌ Spigot",
-                                    value="Spigot timings have limited information. Switch to [Paper](https://papermc.io/) for better timings analysis.")
+                                    value="Spigot timings have limited information. Switch to [Paper]("
+                                          "https://papermc.io/) for better timings analysis.")
                 embed_var.url = word
                 await message.reply(embed=embed_var)
                 return
@@ -78,7 +82,8 @@ class Timings(commands.Cog):
                         if compare_versions(version_result, TIMINGS_CHECK["version"]) == -1:
                             version = version.replace("git-", "").replace("MC: ", "")
                             embed_var.add_field(name="❌ Outdated",
-                                                value=f'You are using `{version}`. Update to `{TIMINGS_CHECK["version"]}`.')
+                                                value=f'You are using `{version}`. Update to'
+                                                      f' `{TIMINGS_CHECK["version"]}`.')
                     else:
                         embed_var.add_field(name="❗ Value Error",
                                             value=f'Could not locate version from `{version}`')
@@ -94,7 +99,8 @@ class Timings(commands.Cog):
                 timing_cost = int(request["timingsMaster"]["system"]["timingcost"])
                 if timing_cost > 300:
                     embed_var.add_field(name="❌ Timingcost",
-                                        value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. Find a better host.")
+                                        value=f"Your timingcost is {timing_cost}. Your cpu is overloaded and/or slow. "
+                                              f"Find a better host.")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
@@ -102,7 +108,8 @@ class Timings(commands.Cog):
                 jvm_version = request["timingsMaster"]["system"]["jvmversion"]
                 if jvm_version.startswith("1.8.") or jvm_version.startswith("9.") or jvm_version.startswith("10."):
                     embed_var.add_field(name="❌ Java Version",
-                                        value=f"You are using Java {jvm_version}. Update to [Java 11](https://adoptopenjdk.net/installation.html).")
+                                        value=f"You are using Java {jvm_version}. Update to [Java 11]("
+                                              f"https://adoptopenjdk.net/installation.html).")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
@@ -115,7 +122,6 @@ class Timings(commands.Cog):
                         embed_var.add_field(name="❌ Java " + java_version,
                                             value="ZGC should only be used on Java 15.")
                     if "-Xmx" in flags:
-                        max_mem = 0
                         flaglist = flags.split(" ")
                         for flag in flaglist:
                             if flag.startswith("-Xmx"):
@@ -150,7 +156,8 @@ class Timings(commands.Cog):
                                 max_mem = max_mem.replace("m", "")
                         if int(max_mem) < 5400:
                             embed_var.add_field(name="❌ Low Memory",
-                                                value="Allocate at least 6-10GB of ram to your server if you can afford it.")
+                                                value="Allocate at least 6-10GB of ram to your server if you can "
+                                                      "afford it.")
                         index = 0
                         max_online_players = 0
                         while index < len(request["timingsMaster"]["data"]):
@@ -176,13 +183,16 @@ class Timings(commands.Cog):
                                     min_mem = min_mem.replace("m", "")
                             if min_mem != max_mem:
                                 embed_var.add_field(name="❌ Aikar's Flags",
-                                                    value="Your Xmx and Xms values should be equal when using Aikar's flags.")
+                                                    value="Your Xmx and Xms values should be equal when using Aikar's "
+                                                          "flags.")
                 elif "-Dusing.aikars.flags=mcflags.emc.gs" in flags:
                     embed_var.add_field(name="❌ Outdated Flags",
-                                        value="Update [Aikar's flags](https://aikar.co/2018/07/02/tuning-the-jvm-g1gc-garbage-collector-flags-for-minecraft/).")
+                                        value="Update [Aikar's flags](https://aikar.co/2018/07/02/tuning-the-jvm-g1gc"
+                                              "-garbage-collector-flags-for-minecraft/).")
                 else:
                     embed_var.add_field(name="❌ Aikar's Flags",
-                                        value="Use [Aikar's flags](https://aikar.co/2018/07/02/tuning-the-jvm-g1gc-garbage-collector-flags-for-minecraft/).")
+                                        value="Use [Aikar's flags](https://aikar.co/2018/07/02/tuning-the-jvm-g1gc"
+                                              "-garbage-collector-flags-for-minecraft/).")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
@@ -209,12 +219,19 @@ class Timings(commands.Cog):
                 logging.info("Missing: " + str(key))
 
             plugins = request["timingsMaster"]["plugins"] if "plugins" in request["timingsMaster"] else None
-            server_properties = request["timingsMaster"]["config"]["server.properties"] if "server.properties" in request["timingsMaster"]["config"] else None
-            bukkit = request["timingsMaster"]["config"]["bukkit"] if "bukkit" in request["timingsMaster"]["config"] else None
-            spigot = request["timingsMaster"]["config"]["spigot"] if "spigot" in request["timingsMaster"]["config"] else None
-            paper = request["timingsMaster"]["config"]["paper"] if "paper" in request["timingsMaster"]["config"] else None
-            tuinity = request["timingsMaster"]["config"]["tuinity"] if "tuinity" in request["timingsMaster"]["config"] else None
-            purpur = request["timingsMaster"]["config"]["purpur"] if "purpur" in request["timingsMaster"]["config"] else None
+            server_properties = request["timingsMaster"]["config"]["server.properties"] if "server.properties" in \
+                                                                                           request["timingsMaster"][
+                                                                                               "config"] else None
+            bukkit = request["timingsMaster"]["config"]["bukkit"] if "bukkit" in request["timingsMaster"][
+                "config"] else None
+            spigot = request["timingsMaster"]["config"]["spigot"] if "spigot" in request["timingsMaster"][
+                "config"] else None
+            paper = request["timingsMaster"]["config"]["paper"] if "paper" in request["timingsMaster"][
+                "config"] else None
+            tuinity = request["timingsMaster"]["config"]["tuinity"] if "tuinity" in request["timingsMaster"][
+                "config"] else None
+            purpur = request["timingsMaster"]["config"]["purpur"] if "purpur" in request["timingsMaster"][
+                "config"] else None
             if not YAML_ERROR:
                 if "plugins" in TIMINGS_CHECK:
                     for server_name in TIMINGS_CHECK["plugins"]:
@@ -246,14 +263,19 @@ class Timings(commands.Cog):
                     if authors is not None and "songoda" in request["timingsMaster"]["plugins"][plugin]["authors"].casefold():
                         if plugin == "EpicHeads":
                             embed_var.add_field(name="❌ EpicHeads",
-                                                value="This plugin was made by Songoda. Songoda is sketchy. You should find an alternative such as [HeadsPlus](https://spigotmc.org/resources/headsplus-»-1-8-1-16-4.40265/) or [HeadDatabase](https://www.spigotmc.org/resources/head-database.14280/).")
+                                                value="This plugin was made by Songoda. Songoda is sketchy. You "
+                                                      "should find an alternative such as [HeadsPlus]("
+                                                      "https://spigotmc.org/resources/headsplus-»-1-8-1-16-4.40265/) "
+                                                      "or [HeadDatabase]("
+                                                      "https://www.spigotmc.org/resources/head-database.14280/).")
                         elif plugin == "UltimateStacker":
                             embed_var.add_field(name="❌ UltimateStacker",
                                                 value="Stacking plugins actually causes more lag. "
                                                       "Remove UltimateStacker.")
                         else:
                             embed_var.add_field(name="❌ " + plugin,
-                                                value="This plugin was made by Songoda. Songoda is sketchy. You should find an alternative.")
+                                                value="This plugin was made by Songoda. Songoda is sketchy. You "
+                                                      "should find an alternative.")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
@@ -267,12 +289,14 @@ class Timings(commands.Cog):
                         if ntvd <= tvd and tvd >= 5:
                             if spigot["world-settings"]["default"]["view-distance"] == "default":
                                 embed_var.add_field(name="❌ no-tick-view-distance",
-                                                    value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
-                                                          f"And reduce view-distance from default ({tvd}) in [spigot.yml](http://bit.ly/spiconf). Recommended: 4.")
+                                                    value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: "
+                                                          f"{tvd}. And reduce view-distance from default ({tvd}) in ["
+                                                          f"spigot.yml](http://bit.ly/spiconf). Recommended: 4.")
                             else:
                                 embed_var.add_field(name="❌ no-tick-view-distance",
-                                                    value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: {tvd}. "
-                                                          f"And reduce view-distance from {tvd} in [spigot.yml](http://bit.ly/spiconf). Recommended: 4.")
+                                                    value=f"Set in [paper.yml](http://bit.ly/paperconf). Recommended: "
+                                                          f"{tvd}. And reduce view-distance from {tvd} in [spigot.yml]("
+                                                          f"http://bit.ly/spiconf). Recommended: 4.")
                             break
             except KeyError as key:
                 logging.info("Missing: " + str(key))
@@ -286,10 +310,10 @@ class Timings(commands.Cog):
                         high_mec = True
                 if high_mec:
                     embed_var.add_field(name="❌ maxEntityCramming",
-                                        value=f"Decrease this by running the /gamerule command in each world. Recommended: 8. ")
+                                        value=f"Decrease this by running the /gamerule command in each world. "
+                                              f"Recommended: 8. ")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
-
 
             try:
                 normal_ticks = request["timingsMaster"]["data"][0]["totalTicks"]
@@ -308,8 +332,8 @@ class Timings(commands.Cog):
                 else:
                     red = int(255 * (-0.1 * worst_tps + 2))
                     green = 255
-                color = int(red*256*256 + green*256)
-                embed_var.color = color
+                color = int(red * 256 * 256 + green * 256)
+                embed_var.colour = color
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 
@@ -328,11 +352,13 @@ class Timings(commands.Cog):
         field_at_index = 24
         if issue_count >= 25:
             embed_var.insert_field_at(index=24, name=f"Plus {issue_count - 24} more recommendations",
-                                      value="Create a new timings report after resolving some of the above issues to see more.")
+                                      value="Create a new timings report after resolving some of the above issues to "
+                                            "see more.")
         while len(embed_var) > 6000:
             embed_var.insert_field_at(index=field_at_index,
                                       name=f"Plus {issue_count - field_at_index} more recommendations",
-                                      value="Create a new timings report after resolving some of the above issues to see more.")
+                                      value="Create a new timings report after resolving some of the above issues to "
+                                            "see more.")
             del embed_var._fields[(field_at_index + 1):]
             field_at_index -= 1
         await message.reply(embed=embed_var)

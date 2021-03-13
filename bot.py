@@ -1,15 +1,17 @@
 """ IMPORTS """
 
-import os
-import discord
-import requests
 import json
 import logging
+import os
 import sys
-from discord.ext import commands, tasks
-from discord.ext.commands import has_permissions, MissingPermissions
-from dotenv import load_dotenv
 from difflib import get_close_matches
+
+import discord
+import requests
+from discord.ext import commands
+from discord.ext.commands import has_permissions
+from dotenv import load_dotenv
+
 # Imports wiki only if library exists
 try:
     if os.path.exists("wiki.py"):
@@ -17,14 +19,12 @@ try:
 except ImportError:
     print("Wiki module import not functioning (wiki.py). Is the file corrupt?")
 
-
 """ DEFINE BOT """
 bot = commands.Bot(
     command_prefix=".",
     intents=discord.Intents.default(),
     case_insensitive=True
 )
-
 
 """ UTILITY FUNCTIONS """
 
@@ -104,7 +104,9 @@ async def process_potential_logs(ctx):
 
 async def ask_to_ask(ctx):
     if get_close_matches(ctx.content, a2a_definitions, 1, 0.8):
-        await ctx.channel.send(embed=get_embed("Please do not ask to ask", 'Just ask your question {} \nhttps://dontasktoask.com/'.format(ctx.author.name)))
+        await ctx.channel.send(embed=get_embed("Please do not ask to ask",
+                                               'Just ask your question {} \nhttps://dontasktoask.com/'.format(
+                                                   ctx.author.name)))
         await ctx.delete()
         return True
     return False
@@ -136,9 +138,6 @@ async def on_message(ctx):
         return
 
     # Process pastes
-    invalid_extensions = ('.png', '.jpg', '.jpeg', '.mp4',
-                          '.mov', '.avi', '.gif', '.image', 
-                          '.svg', '.mp3', '.jar', '.class')
     whitelist = ('.log', '.txt', '.md', '.java', '.py', '.cpp', '.cs', '.yml')
     if await process_potential_paste(ctx, whitelist):
         return
@@ -178,14 +177,16 @@ async def reload_modules(ctx, *args):
     for module in args:
         if module.endswith(".py"):
             module = module.replace(".py", "")
-        try: 
+        try:
             exec('global {}lib'.format(module))
             exec('import {} as {}lib'.format(module, module))
-            await ctx.send(embed = get_embed("Reloaded " + module, "Successfully reloaded the {} module".format(module)))
+            await ctx.send(embed=get_embed("Reloaded " + module, "Successfully reloaded the {} module".format(module)))
             res.append(module)
         except Exception:
-            await ctx.send(embed = get_embed("Error while importing " + module, "Did you place the module in the folder?"))
+            await ctx.send(
+                embed=get_embed("Error while importing " + module, "Did you place the module in the folder?"))
     print("Reloaded modules (" + ", ".join(res) + ")")
+
 
 @bot.command()
 async def reloadw(ctx):
@@ -193,14 +194,24 @@ async def reloadw(ctx):
     global Wiki
     Wiki = wikilib.Wiki(0)
 
+
 @bot.command()
 async def invite(ctx):
-    await ctx.send('Invite me with this link:\nhttps://discord.com/oauth2/authorize?client_id=801178754772500500&permissions=0&scope=bot')
+    await ctx.send('Invite me with this link:\nhttps://discord.com/oauth2/authorize?client_id=801178754772500500'
+                   '&permissions=0&scope=bot')
 
 
 @bot.command()
 async def packs(ctx):
-    await ctx.send(embed=get_embed("Public Packs", '[Overworld](https://github.com/IrisDimensions/overworld)\n[Continents](https://github.com/Astrashh/Continents) (WIP)'))
+    await ctx.send(embed=get_embed("Public Packs", '[Overworld](https://github.com/IrisDimensions/overworld)\n['
+                                                   'Continents](https://github.com/Astrashh/Continents) (WIP)'))
+
+
+@bot.command()
+async def xyproblem(ctx):
+    await ctx.send(embed=get_embed("The XY Problem", 'Do not ask about your attempted solution, '
+                                                     'but about your actual problem {} '
+                                                     '\nhttps://xyproblem.info/'.format(ctx.author.name)))
 
 
 @bot.command(name="react", pass_context=True)
@@ -232,7 +243,7 @@ logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 for file_name in os.listdir('./cogs'):
     if file_name.endswith('.py'):
         bot.load_extension(f'cogs.{file_name[:-3]}')
-        
+
 # Load token and run bot
 load_dotenv()
 token = os.getenv('token')
