@@ -10,12 +10,12 @@ servers:
 - name: "Yatopia"
   prefix: "❌"
   value: |-
-    Yatopia is prone to bugs.
-    Consider using [Purpur](https://ci.pl3x.net/job/Purpur/).
+    Yatopia is unstable and prone to bugs.
+    Consider using [Paper](https://papermc.io/).
 - name: "Paper"
   prefix: "❌"
   value: |-
-    Purpur has more optimizations. Consider using [Purpur](https://ci.pl3x.net/job/Purpur/).
+    Paper has more optimizations. Consider using [Paper](https://papermc.io/).
 plugins:
   paper:
     ClearLag:
