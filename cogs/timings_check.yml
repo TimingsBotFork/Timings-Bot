@@ -12,10 +12,6 @@ servers:
   value: |-
     Yatopia is unstable and prone to bugs.
     Consider using [Paper](https://papermc.io/).
-- name: "Paper"
-  prefix: "❌"
-  value: |-
-    Paper has more optimizations. Consider using [Paper](https://papermc.io/).
 plugins:
   paper:
     ClearLag:
