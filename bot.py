@@ -4,48 +4,28 @@ import json
 import logging
 import os
 import sys
-from difflib import get_close_matches
 
 import discord
 import requests
-from discord.ext import commands
-from discord.ext.commands import has_permissions
+from discord.ext.commands.context import Context
+from discord.ext.commands import Bot
 from dotenv import load_dotenv
 
 # Imports wiki only if library exists
-try:
-    if os.path.exists("wiki.py"):
-        import wiki as wikilib
-except ImportError:
-    print("Wiki module import not functioning (wiki.py). Is the file corrupt?")
 
 """ DEFINE BOT """
-bot = commands.Bot(
+bot = Bot(
     command_prefix=".",
     intents=discord.Intents.default(),
     case_insensitive=True
 )
 
 """ UTILITY FUNCTIONS """
-
-
-def retrieve_definitions(path):
-    """ Retrieves definitions from a json at path `path` - str """
-    if not os.path.exists(path):
-        print("Could not find {}. Please make sure the file is there.".format(path))
-    else:
-        with open(path) as file:
-            r = json.load(file)
-            file.close()
-            return r
-
-
-def get_embed(title, description):
+def get_embed(title: str, description: str):
     """ Returns an embed with `title` -str title and `descrption` -str body. """
     return discord.Embed(title=title, description=description, color=0x1D83D4)
 
-
-def process_text(text, author):
+def process_text(text: str, author: str):
     # . r = requests.get(download, allow_redirects=True)
     text = "\n".join(text.splitlines())
     if '�' not in text:  # If it's not an image/gif
@@ -63,8 +43,7 @@ def process_text(text, author):
     else:
         return "ERROR: Received data is image or gif" + "\nRequested by " + author
 
-
-async def process_potential_paste(ctx, whitelist):
+async def process_potential_paste(ctx: Context, whitelist: tuple):
     if len(ctx.attachments) > 0 and ctx.attachments[0].url.endswith(whitelist):
         text = await discord.Attachment.read(ctx.attachments[0], use_cached=False)
         response = process_text(text.decode('Latin-1'), ctx.author.mention)
@@ -72,8 +51,7 @@ async def process_potential_paste(ctx, whitelist):
         return True
     return False
 
-
-async def process_potential_logs(ctx):
+async def process_potential_logs(ctx: Context):
     """
     1. Check tests and sum results
     2. Check if passed threshold
@@ -102,19 +80,8 @@ async def process_potential_logs(ctx):
     return False
 
 
-async def ask_to_ask(ctx):
-    if get_close_matches(ctx.content, a2a_definitions, 1, 0.8):
-        await ctx.channel.send(embed=get_embed("Please do not ask to ask",
-                                               'Just ask your question {} \nhttps://dontasktoask.com/'.format(
-                                                   ctx.author.name)))
-        await ctx.delete()
-        return True
-    return False
-
 
 """ BOT EVENTS AND COMMANDS """
-
-
 @bot.event
 async def on_ready():
     # Marks bot as running
@@ -123,12 +90,9 @@ async def on_ready():
     logging.info('Bot ID: {}'.format(bot.user.id))
     logging.info('Bot fully loaded')
     logging.info('Original creators: https://github.com/Pemigrade/botflop')
-    global Wiki
-    Wiki = wikilib.Wiki(0)
-
 
 @bot.event
-async def on_message(ctx):
+async def on_message(ctx: Context):
     # Prevent responding to bot messages
     if ctx.author == bot.user:
         return
@@ -146,89 +110,36 @@ async def on_message(ctx):
     if await process_potential_logs(ctx):
         return
 
-    # Check for people asking to ask
-    if await ask_to_ask(ctx):
-        return
-
     # Process timings
-    timings = bot.get_cog('Timings')
-    await timings.analyze_timings(ctx)
+    if ctx.channel.name == "Optimization":
+        timings = bot.get_cog('Timings')
+        await timings.analyze_timings(ctx)
 
     # Process commands
     await bot.process_commands(ctx)
 
-
 @bot.command()
-async def ping(ctx):
+async def ping(ctx: Context):
+    print(type(ctx))
     await ctx.send(f'Kahti bot ping is {round(bot.latency * 1000)}ms')
 
-
-# Only used if the wiki library is present in the folder
 @bot.command()
-async def wiki(ctx, *args):
-    if os.path.exists("wiki.py"):
-        await Wiki.wiki(ctx, *args)
-
-
-@bot.command()
-async def reload_modules(ctx, *args):
-    """ Reloads all modules specified in `args` """
-    res = []
-    for module in args:
-        if module.endswith(".py"):
-            module = module.replace(".py", "")
-        try:
-            exec('global {}lib'.format(module))
-            exec('import {} as {}lib'.format(module, module))
-            await ctx.send(embed=get_embed("Reloaded " + module, "Successfully reloaded the {} module".format(module)))
-            res.append(module)
-        except Exception:
-            await ctx.send(
-                embed=get_embed("Error while importing " + module, "Did you place the module in the folder?"))
-    print("Reloaded modules (" + ", ".join(res) + ")")
-
-
-@bot.command()
-async def reloadw(ctx):
-    await reload_modules(ctx, "wiki.py")
-    global Wiki
-    Wiki = wikilib.Wiki(0)
-
-
-@bot.command()
-async def invite(ctx):
+async def invite(ctx: Context):
     await ctx.send('Invite me with this link:\nhttps://discord.com/oauth2/authorize?client_id=801178754772500500'
                    '&permissions=0&scope=bot')
 
-
-@bot.command()
-async def packs(ctx):
-    await ctx.send(embed=get_embed("Public Packs", '[Overworld](https://github.com/IrisDimensions/overworld)\n['
-                                                   'Continents](https://github.com/Astrashh/Continents) (WIP)'))
-
-
-@bot.command()
-async def xyproblem(ctx):
-    await ctx.send(embed=get_embed("The XY Problem", 'Do not ask about your attempted solution, '
-                                                     'but about your actual problem {} '
-                                                     '\nhttps://xyproblem.info/'.format(ctx.author.name)))
-
-
-@bot.command(name="react", pass_context=True)
-@has_permissions(administrator=True)
-async def react(ctx, url, reaction):
-    channel = await bot.fetch_channel(int(url.split("/")[5]))
-    message = await channel.fetch_message(int(url.split("/")[6]))
-    await message.add_reaction(reaction)
-    logging.info('reacted to ' + url + ' with ' + reaction)
-
-
 """ SETUP """
 
-# Get ask-to-ask and pasted log/code definitions
-a2a_definitions = retrieve_definitions('ask-to-ask.json')["definitions"]
-pl_definitions = retrieve_definitions('pasted-logs.json')["definitions"]
-pl_threshold = retrieve_definitions('pasted-logs.json')["threshold"]
+# Pasted-log definitions
+pl_definitions = {
+    "ERROR": 20,
+    "INFO": 20,
+    "WARN": 20,
+    "ERROR]:": 20,
+    "INFO]:": 30,
+    "WARN]:": 20
+}
+pl_threshold = 50
 
 # Configure logger
 logging.basicConfig(
@@ -248,5 +159,3 @@ for file_name in os.listdir('./cogs'):
 load_dotenv()
 token = os.getenv('token')
 bot.run(token)
-
-# full name: message.author.name + "#" + str(message.author.discriminator) + " (" + str(message.author.id) + ")"
