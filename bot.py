@@ -111,7 +111,7 @@ async def on_message(ctx: Context):
         return
 
     # Process timings
-    if ctx.channel.name == "Optimization":
+    if ctx.channel.name == ["Optimization","»📩optimalization"]:
         timings = bot.get_cog('Timings')
         await timings.analyze_timings(ctx)
 
