@@ -113,16 +113,16 @@ async def on_message(ctx: Context):
     # Process timings
     if (
         (
-            ctx.channel.guild.id == "189665083817852928"
-            and ctx.channel.id == "412104341743468554"
+            ctx.channel.guild.id == 189665083817852928
+            and ctx.channel.id == 412104341743468554
         )
         or (
-            ctx.channel.guild.id == "399547550580998146"
-            and ctx.channel.id == "808641752838832159"
+            ctx.channel.guild.id == 399547550580998146
+            and ctx.channel.id == 808641752838832159
         )
         or (
-            ctx.channel.guild.id != "189665083817852928"
-            and ctx.channel.guild.id != "399547550580998146"
+            ctx.channel.guild.id != 189665083817852928
+            and ctx.channel.guild.id != 399547550580998146
         )
     ):
         timings = bot.get_cog("Timings")
