@@ -32,7 +32,7 @@ class Timings(commands.Cog):
 
         for word in words:
             if word.startswith("https://timin") and "/d=" in word:
-                word.replace("/d=", "/?id=")
+                word.replace("/d=", "/?id=") # this seems to be a common issue when people post their links
             if word.startswith("https://timin") and "/?id=" in word:
                 timings_url = word
                 embed_var.url = timings_url
@@ -71,6 +71,10 @@ class Timings(commands.Cog):
         try:
             try:
                 version = request["timingsMaster"]["version"] if "version" in request["timingsMaster"] else None
+                print(version)
+                if version.count('.') == 1:
+                    version = version[:-1]
+                    version = version + ".0)"
                 if "version" in TIMINGS_CHECK and version:
                     version_result = VERSION_REGEX.search(version)
                     version_result = version_result.group() if version_result else None
@@ -102,7 +106,7 @@ class Timings(commands.Cog):
                 jvm_version = request["timingsMaster"]["system"]["jvmversion"]
                 if jvm_version.startswith("1.8.") or jvm_version.startswith("9.") or jvm_version.startswith("10."):
                     embed_var.add_field(name="❌ Java Version",
-                                        value=f"You are using Java {jvm_version}. Update to [Java 11](https://adoptopenjdk.net/installation.html).")
+                                        vvalue=f"You are using Java {jvm_version}. Update to [Java 16](https://adoptopenjdk.net/installation.html).")
             except KeyError as key:
                 logging.info("Missing: " + str(key))
 

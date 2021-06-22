@@ -11,7 +11,11 @@ servers:
   prefix: "❌"
   value: |-
     Yatopia is unstable and prone to bugs.
-    Consider using [Paper](https://papermc.io/).
+    Consider using [Tuinity](https://ci.codemc.io/job/Spottedleaf/job/Tuinity/), [Purpur](https://ci.pl3x.net/job/Purpur/), or [Airplane](https://ci.tivy.ca/).
+- name: "Paper"
+  prefix: "❌"
+  value: |-
+    [Tuinity](https://ci.codemc.io/job/Spottedleaf/job/Tuinity/), [Purpur](https://ci.pl3x.net/job/Purpur/), and [Airplane](https://ci.tivy.ca/) have more optimizations with similar stability levels. Consider using one of them.
 plugins:
   paper:
     ClearLag:
